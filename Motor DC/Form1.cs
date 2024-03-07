@@ -14,6 +14,7 @@ namespace Motor_DC
     public partial class Form1 : Form
     {
         ModbusClient ModClient = new ModbusClient();
+        ModbusClient ModClient2 = new ModbusClient();
         bool IsReading = false;
         public Form1()
         {
@@ -39,11 +40,16 @@ namespace Motor_DC
         {
             if(btnConnect.Text == "Connect")
             {
-                ModClient.SerialPort = txtPort1.Text;
+                ModClient.SerialPort = cPort1.Text;
                 ModClient.Baudrate = int.Parse(txtBaudrate.Text);
                 ModClient.Parity = System.IO.Ports.Parity.None;
                 ModClient.ConnectionTimeout = 1000;
                 ModClient.Connect();
+                ModClient2.SerialPort = cPort2.Text;
+                ModClient2.Baudrate = int.Parse(txtBaudrate.Text);
+                ModClient2.Parity = System.IO.Ports.Parity.None;
+                ModClient2.ConnectionTimeout = 1000;
+                ModClient2.Connect();
                 timerPoll.Start();
                 lblStatus.Text = "Connected";
                 btnConnect.Text = "Disconnect";
@@ -52,6 +58,7 @@ namespace Motor_DC
                 timerPoll.Stop();
                 timer1.Stop();
                 ModClient.Disconnect();
+                ModClient2.Disconnect();
                 lblStatus.Text = "Disconnected";
                 btnConnect.Text = "Connect";
             }
@@ -83,6 +90,10 @@ namespace Motor_DC
             ModClient.WriteSingleRegister(1, int.Parse(tReg2_1.Text));
             ModClient.WriteSingleRegister(2, int.Parse(tReg3_1.Text));
 
+            ModClient.UnitIdentifier = 10;
+            ModClient.WriteSingleRegister(1, int.Parse(tReg2_2.Text));
+            ModClient.WriteSingleRegister(2, int.Parse(tReg3_2.Text));
+
         }
 
         private void btn_1_Click(object sender, EventArgs e)
@@ -93,8 +104,21 @@ namespace Motor_DC
                 {
                     ModClient.UnitIdentifier = 11;
                     ModClient.WriteSingleRegister(0, 1);
+                    ModClient2.UnitIdentifier = 10;
+                    ModClient2.WriteSingleRegister(0, 1);
                     IsReading = true;
                     timer1.Start();
+                    btn_1.Text = "0";
+                } else
+                {
+                    ModClient.UnitIdentifier = 11;
+                    ModClient.WriteSingleRegister(0, 0);
+                    ModClient.WriteSingleRegister(3, 1);
+                    ModClient2.UnitIdentifier = 10;
+                    ModClient2.WriteSingleRegister(0, 0);
+                    ModClient2.WriteSingleRegister(3, 1);
+                    timer1.Stop();
+                    btn_1.Text = "1";
                 }
             }
             catch (Exception ex)
@@ -110,15 +134,21 @@ namespace Motor_DC
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            if (ModClient.Connected == true)
+            if (ModClient.Connected == true && ModClient2.Connected == true)
             {
                 //read 1st slave
                 ModClient.UnitIdentifier = 11;
                 int[] vals = ModClient.ReadHoldingRegisters(0, 6);
                 tReg1_1.Text = vals[0].ToString();
-                tReg4_1.Text = vals[3].ToString();
                 tReg5_1.Text = vals[4].ToString();
                 tReg6_1.Text = vals[5].ToString();
+
+                //read 2nd slave
+                ModClient2.UnitIdentifier = 10;
+                int[] vals2 = ModClient2.ReadHoldingRegisters(0, 6);
+                tReg1_2.Text = vals2[0].ToString();
+                tReg5_2.Text = vals2[4].ToString();
+                tReg6_2.Text = vals2[5].ToString();
             }
         }
 
@@ -126,6 +156,9 @@ namespace Motor_DC
         {
             ModClient.UnitIdentifier = 11;
             ModClient.WriteSingleRegister(3, 1);
+
+            ModClient2.UnitIdentifier = 10;
+            ModClient2.WriteSingleRegister(3, 1);
         }
 
         private void bStop_Click(object sender, EventArgs e)
@@ -133,14 +166,23 @@ namespace Motor_DC
             ModClient.UnitIdentifier = 11;
             ModClient.WriteSingleRegister(1, 0);
             ModClient.WriteSingleRegister(2, 0);
+
+            ModClient2.UnitIdentifier = 10;
+            ModClient2.WriteSingleRegister(1, 0);
+            ModClient2.WriteSingleRegister(2, 0);
         }
 
-        private void pictureBox1_Click(object sender, EventArgs e)
+        private void label3_Click_1(object sender, EventArgs e)
         {
 
         }
 
-        private void pictureBox1_Click_1(object sender, EventArgs e)
+        private void label19_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }
