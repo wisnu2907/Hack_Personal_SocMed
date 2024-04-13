@@ -1,0 +1,13 @@
+C:\Users\wisnu\Coding\Motor DC\obj\Debug\Motor DC.csproj.AssemblyReference.cache
+C:\Users\wisnu\Coding\Motor DC\obj\Debug\Motor_DC.Form1.resources
+C:\Users\wisnu\Coding\Motor DC\obj\Debug\Motor_DC.Properties.Resources.resources
+C:\Users\wisnu\Coding\Motor DC\obj\Debug\Motor DC.csproj.GenerateResource.cache
+C:\Users\wisnu\Coding\Motor DC\obj\Debug\Motor DC.csproj.CoreCompileInputs.cache
+C:\Users\wisnu\Coding\Motor DC\bin\Debug\Motor DC.exe.config
+C:\Users\wisnu\Coding\Motor DC\bin\Debug\Motor DC.exe
+C:\Users\wisnu\Coding\Motor DC\bin\Debug\Motor DC.pdb
+C:\Users\wisnu\Coding\Motor DC\bin\Debug\EasyModbus.dll
+C:\Users\wisnu\Coding\Motor DC\bin\Debug\EasyModbus.xml
+C:\Users\wisnu\Coding\Motor DC\obj\Debug\Motor DC.csproj.CopyComplete
+C:\Users\wisnu\Coding\Motor DC\obj\Debug\Motor DC.exe
+C:\Users\wisnu\Coding\Motor DC\obj\Debug\Motor DC.pdb
