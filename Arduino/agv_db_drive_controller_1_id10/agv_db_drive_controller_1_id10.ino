@@ -16,16 +16,11 @@
 */
 //-----------------------------------------
 
-// #include <ModbusRtu.h>
-
-// // data array for modbus network sharing
-// uint16_t data_comm[6] = { 0, 0, 0, 0, 0, 0 };
-
-// Modbus slave(10, Serial, 0); // this is slave @10 and RS-232 or USB-FTDI
-
 //-----------------------------------------
 
 #include <Encoder.h>
+
+#define ledbuiltin 13
 
 Encoder myEncL(3, 4);
 Encoder myEncR(2, 8);
@@ -69,37 +64,25 @@ void init_motor() {
 }
 
 void agv_motor(int ll, int rr) {
-  if (Serial.available() > 0) {
-    if (ll < 0) {
-      digitalWrite(DIR_L, LOW);
-      analogWrite(PWM_L, -ll);
-    } else if (ll > 0) {
-      digitalWrite(DIR_L, HIGH);
-      analogWrite(PWM_L, ll);
-    } else {
-      analogWrite(PWM_L, 0);
-    }
-
-    if (rr < 0) {
-      digitalWrite(DIR_R, HIGH);
-      analogWrite(PWM_R, -rr);
-    } else if (rr > 0) {
-      digitalWrite(DIR_R, LOW);
-      analogWrite(PWM_R, rr);
-    } else {
-      analogWrite(PWM_R, 0);
-    }
+  digitalWrite(13, HIGH);
+  if (ll < 0) {
+    digitalWrite(DIR_L, LOW);
+    analogWrite(PWM_L, -ll);
+  } else if (ll > 0) {
+    digitalWrite(DIR_L, HIGH);
+    analogWrite(PWM_L, ll);
   } else {
     analogWrite(PWM_L, 0);
+  }
+
+  if (rr < 0) {
+    digitalWrite(DIR_R, HIGH);
+    analogWrite(PWM_R, -rr);
+  } else if (rr > 0) {
+    digitalWrite(DIR_R, LOW);
+    analogWrite(PWM_R, rr);
+  } else {
     analogWrite(PWM_R, 0);
-    mErrL = 0;
-    mErrR = 0;
-    mdErrL = 0;
-    mdErrR = 0;
-    SpeedL = 0;
-    SpeedR = 0;
-    mLastL = 0;
-    mLastR = 0;
   }
 }
 
@@ -113,10 +96,8 @@ void com_agv_motor(int dSL, int dSR) {
   CountL += (float)dRL / 42.2;
   CountR += (float)dRR / 42.2;
 
-  // data_comm[4] = CountL;
-  // data_comm[5] = CountR;
-  Serial.print(CountL);
-  Serial.print(CountR);
+  // Serial.print(CountL);
+  // Serial.println(CountR);
 
   myEncL.write(0);
   myEncR.write(0);
@@ -147,99 +128,77 @@ void com_agv_motor(int dSL, int dSR) {
   agv_motor(pwmL, pwmR);
 }
 
+void Forward() {
+  mErrL = 0;
+  mErrR = 0;
+  mdErrL = 0;
+  mdErrR = 0;
+  SpeedL = 0;
+  SpeedR = 0;
+  mLastL = 0;
+  mLastR = 0;
+  CountL = 0, CountR = 0;
+  delay(50);
+  com_agv_motor(6, 6);
+}
 
-#include <Arduino_FreeRTOS.h>
+void Backward() {
+  mErrL = 0;
+  mErrR = 0;
+  mdErrL = 0;
+  mdErrR = 0;
+  SpeedL = 0;
+  SpeedR = 0;
+  mLastL = 0;
+  mLastR = 0;
+  CountL = 0, CountR = 0;
+  delay(50);
+  com_agv_motor(-6, -6);
+}
 
-// define two tasks for Blink & AnalogRead
-void TaskComm(void *pvParameters);
-void TaskMotor(void *pvParameters);
+void Stop() {
+  com_agv_motor(0, 0);
+  analogWrite(PWM_L, 0);
+  analogWrite(PWM_R, 0);
+  mErrL = 0;
+  mErrR = 0;
+  mdErrL = 0;
+  mdErrR = 0;
+  SpeedL = 0;
+  SpeedR = 0;
+  mLastL = 0;
+  mLastR = 0;
+  CountL = 0, CountR = 0;
+  delay(50);
+}
 
 // the setup function runs once when you press reset or power the board
 void setup() {
-
-  // initialize serial communication at 9600 bits per second:
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.setTimeout(1);
   init_motor();
-
-  while (!Serial) {
-    ;  // wait for serial port to connect. Needed for native USB, on LEONARDO, MICRO, YUN, and other 32u4 based boards.
-  }
-
-  // Now set up two tasks to run independently.
-  xTaskCreate(
-    TaskComm, "Comm"  // A name just for humans
-    ,
-    128  // This stack size can be checked & adjusted by reading the Stack Highwater
-    ,
-    NULL, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-    ,
-    NULL);
-
-  xTaskCreate(
-    TaskMotor, "Motor", 128  // Stack size
-    ,
-    NULL, 1  // Priority
-    ,
-    NULL);
-
-  // Now the task scheduler, which takes over control of scheduling individual tasks, is automatically started.
+  pinMode(13, OUTPUT);
 }
 
 void loop() {
-  // Empty. Things are done in Tasks.
-}
-
-/*--------------------------------------------------*/
-/*---------------------- Tasks ---------------------*/
-/*--------------------------------------------------*/
-
-void TaskComm(void *pvParameters)  // This is a task.
-{
-  (void)pvParameters;
-
-  for (;;)  // A Task shall never return or exit.
-  {
-
-    // slave.poll( data_comm, 6 );
-
-    vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
-  }
-}
-
-void TaskMotor(void *pvParameters)  // This is a task.
-{
-  (void)pvParameters;
-
-  for (;;) {
-    if (Serial.available() > 0) {
-      String input = Serial.readStringUntil('\n');
-      int spaceIndex = input.indexOf(' ');
-      if (spaceIndex != -1) {
-        int spd = input.substring(0, spaceIndex).toInt();
-        int dist = input.substring(spaceIndex + 1).toInt();
-        com_agv_motor(spd, spd);
-        if (CountL == dist || CountR == dist) {
-          analogWrite(PWM_L, 0);
-          analogWrite(PWM_R, 0);
-          mErrL = 0;
-          mErrR = 0;
-          mdErrL = 0;
-          mdErrR = 0;
-          SpeedL = 0;
-          SpeedR = 0;
-          mLastL = 0;
-          mLastR = 0;
-          Serial.print("Stop");
-        }
-
-        // CountL = 0;
-        // CountR = 0;
-        // data_comm[3] = 0;
-        // data_comm[4] = 0;
-        // data_comm[5] = 0;
-      }
-      vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
+  //  Gas (20, 150);
+  if (Serial.available() > 0) {
+    mErrL = 0;
+    mErrR = 0;
+    mdErrL = 0;
+    mdErrR = 0;
+    SpeedL = 0;
+    SpeedR = 0;
+    mLastL = 0;
+    mLastR = 0;
+    CountL = 0, CountR = 0;
+    String input = Serial.readStringUntil('\n');
+    if (input == "1") {
+      Forward();
+    } else if (input == "2") {
+      Backward();
+    } else if (input == "0") {
+      Stop();
     }
   }
 }
