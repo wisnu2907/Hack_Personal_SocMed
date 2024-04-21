@@ -164,7 +164,7 @@ while True:
         elif model.names[int(cls)] in ["Kertas Bungkus", "Koran"]:
             serialInst.write("0, 0\n".encode("utf-8"))
             serialInst2.write("Lepas\n".encode("utf-8"))
-        elif model.names[int(cls)] in ["Plastik Ijo", "Plastik Ijo"]:
+        elif model.names[int(cls)] in ["Plastik Putih", "Plastik Ijo"]:
             serialInst.write("40, 40\n".encode("utf-8"))
             serialInst2.write("Lepas\n".encode("utf-8"))
 

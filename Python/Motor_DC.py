@@ -1,44 +1,33 @@
 import serial
 
+# Initialize the serial port for communication
+serialInst = serial.Serial("COM8", 115200)
+serialInst1 = serial.Serial("COM7", 115200)
 
-def Connect(port):
-    motor = serial.Serial(port, 9600)
+# Close the serial port if it's already open
+if serialInst.is_open:
+    serialInst.close()
 
-    if motor.is_open:
-        motor.close()
+# Open the serial port
+serialInst.open()
 
-    motor.open()
-    return motor
+if serialInst1.is_open:
+    serialInst1.close()
 
+# Open the serial port
+serialInst1.open()
 
-def Forward(pwm, dist, motor):
-    command = "{} {}\n".format(pwm, dist)
-    motor.write(command.encode("utf-8"))
-    while True:
-        data = read_data(motor)
-        if data == "Stop":
-            break
+# def maju(pwm, dist):
+#     command = "{} {}\n".format(pwm, dist)
+#     print(command)
+#     serialInst1.write(command.encode('utf-8'))
+#     serialInst.write(command.encode('utf-8'))
 
+# maju(10, 100)
+command =("1")
+print(command)
+serialInst1.write(command.encode("utf-8"))
+serialInst.write(command.encode("utf-8"))
 
-def Backward(pwm, dist, motor):
-    command = "-{} {}\n".format(pwm, dist)
-    motor.write(command.encode("utf-8"))
-    while True:
-        data = read_data(motor)
-        if data == "Stop":
-            break
-
-
-def read_data(motor):
-    if motor.in_waiting > 0:
-        data = motor.readline().decode().strip()
-        return data
-    else:
-        return None
-
-
-if __name__ == "__main__":
-    motor = Connect("COM7")
-    if motor:
-        Forward(150, 10, motor)
-        Backward(150, 10, motor)
+serialInst.close()
+serialInst1.close()

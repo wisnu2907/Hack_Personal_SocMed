@@ -4,16 +4,68 @@ import cv2
 import numpy as np
 import serial.tools.list_ports
 import torch
-from ultralytics import YOLO
+import serial
+from ultralytics import YOLO    
+    
+# def arm_move():
+#     global center_y_cm, center_x_cm
+#     # Move arm based on center coordinates
+#     command = f"{center_x_cm:.5f} {center_y_cm:.5f}\n"
+#     Arm.write(command.encode("utf-8"))
 
-# Initialize the serial port for communication
-serialInst = serial.Serial("COM6", 1000000)
+#     while True:
+#         inp = read_data(Arm)
+#         if inp == "1" or 1:
+#             break
+    
+def ambil():
+    print("ambil")
+
+    # while True:
+    #     if read_data(Arm) == "2" or 2:
+    #         break
+    
+def   Forward():
+    command = ("1\n")
+    Motor1.write(command.encode('utf-8'))
+    Motor2.write(command.encode('utf-8'))
+    
+def Backward():
+    command = ("2\n")
+    Motor1.write(command.encode('utf-8'))
+    Motor2.write(command.encode('utf-8'))
+    
+def stop():
+    command = ("0\n")
+    Motor1.write(command.encode('utf-8'))
+    Motor2.write(command.encode('utf-8'))
+
+
+# Arm
+Arm = serial.Serial("COM6", 1000000)
+
+# Motor
+Motor1 = serial.Serial("COM8", 115200) #ID 10
+Motor2 = serial.Serial("COM7", 115200) #ID 11
 
 # Check if the serial port is already open and close it if necessary
-if serialInst.is_open:
-    serialInst.close()
+if Arm.is_open:
+    Arm.close()
 
-serialInst.open()
+Arm.open()
+
+# Close the serial port if it's already open
+if Motor1.is_open:
+    Motor1.close()
+
+# Open the serial port
+Motor1.open()
+
+if Motor2.is_open:
+    Motor2.close()
+
+# Open the serial port
+Motor2.open()
 
 # Initialize the YOLO model
 model = YOLO("Python\\CV\\best.pt")
@@ -50,9 +102,14 @@ if os.path.exists(calibration_file):
     print("Calibration settings loaded.")
 else:
     calibrated = False
+    
+center_x_cm = 0  # Initialize center_x_cm
+center_y_cm = 0  # Initialize center_x_cm    
+
+
 
 while True:
-    # Read a frame from the webcam
+# Read a frame from the webcam
     ret, frame = cap.read()
 
     # Check if the frame is valid
@@ -97,9 +154,6 @@ while True:
         )  # divide by 10 to convert mm to cm
         center_y_cm = y1 / ratio_px_cm / 10  # divide by 10 to convert mm to cm
 
-        command = f"{center_x_cm:.5f} {center_y_cm:.5f}\n"
-        serialInst.write(command.encode("utf-8"))
-
         cv2.circle(frame, (int(center_x_cm), int(center_y_cm)), 5, (0, 255, 255), -1)
 
         # Draw label
@@ -142,6 +196,9 @@ while True:
             (255, 255, 255),
             2,
         )
+        Forward(10, 20)
+        ambil()
+        
 
     # Display the frame
     cv2.imshow("Astro_24", frame)
@@ -149,8 +206,10 @@ while True:
     # Exit if the user presses the 'q' key
     if cv2.waitKey(1) & 0xFF == ord("q"):
         break
-
+        
 # Release the webcam, close the serial port, and destroy all windows
 cap.release()
-serialInst.close()
+Arm.close()
+Motor1.close()
+Motor2.close()
 cv2.destroyAllWindows()
