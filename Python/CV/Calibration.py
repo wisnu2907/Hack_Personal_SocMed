@@ -1,14 +1,7 @@
 import cv2
 import numpy as np
-import torch
-from ultralytics import YOLO
 
-# Initialize the YOLO model
-model = YOLO("Python\\CV\\best.pt")
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model.model.to(device)
-
-# Open the webcam
+# Set the resolution of the webcam
 cap = cv2.VideoCapture(0)
 
 # File name for saving calibration settings
@@ -17,7 +10,6 @@ settings_file = "calibration_settings.npz"
 # Initialize variables for calibration
 clicked_points = []
 calibrated = False
-
 
 # Mouse callback function to capture points for calibration
 def mouse_callback(event, x, y, flags, param):
@@ -37,6 +29,10 @@ cv2.setMouseCallback("Object Detection", mouse_callback)
 while True:
     # Read a frame from the webcam
     ret, frame = cap.read()
+    # Draw a line from top to bottom in the middle of the frame
+    if frame is not None:
+        middle_x = frame.shape[1] // 2
+        cv2.line(frame, (middle_x, 0), (middle_x, frame.shape[0]), (255, 0, 0), 2)
 
     # Calibration
     if calibrated:
