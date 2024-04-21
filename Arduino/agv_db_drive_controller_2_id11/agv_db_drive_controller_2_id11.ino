@@ -4,6 +4,7 @@
 #define pulse_rotation 1988  //
 #define d_wheel 15           // cm
 #define k_wheel (3.14 * 15)
+#define spd 8
 
 /*
    range speed -50 0 50
@@ -27,9 +28,6 @@ Encoder myEncR(2, 8);
 
 long oldPositionL = -999;
 long oldPositionR = -999;
-
-int spd = 0;
-float dist = 0;
 
 void read_encoder() {
   long newPositionL = myEncL.read();
@@ -131,21 +129,28 @@ void com_agv_motor(int dSL, int dSR) {
   agv_motor(pwmL, pwmR);
 }
 
-void Gas(int spd, float dist) {
+void Backward(){
   com_agv_motor(spd, spd);
-  if (CountL >= dist || CountR >= dist) {
-    analogWrite(PWM_L, 0);
-    analogWrite(PWM_R, 0);
-    mErrL = 0;
-    mErrR = 0;
-    mdErrL = 0;
-    mdErrR = 0;
-    SpeedL = 0;
-    SpeedR = 0;
-    mLastL = 0;
-    mLastR = 0;
-    Serial.println("Stop");
-  }
+}
+
+void Forward(){
+  com_agv_motor(-spd, -spd);
+}
+
+void Stop() {
+  com_agv_motor(0, 0);
+  analogWrite(PWM_L, 0);
+  analogWrite(PWM_R, 0);
+  mErrL = 0;
+  mErrR = 0;
+  mdErrL = 0;
+  mdErrR = 0;
+  SpeedL = 0;
+  SpeedR = 0;
+  mLastL = 0;
+  mLastR = 0;
+  CountL = 0, CountR = 0;
+  delay(50);
 }
 
 // the setup function runs once when you press reset or power the board
@@ -159,24 +164,14 @@ void setup() {
 void loop() {
   //  Gas (20, 150);
   if (Serial.available() > 0) {
-    mErrL = 0;
-    mErrR = 0;
-    mdErrL = 0;
-    mdErrR = 0;
-    SpeedL = 0;
-    SpeedR = 0;
-    mLastL = 0;
-    mLastR = 0;
-    CountL = 0, CountR = 0;
     String input = Serial.readStringUntil('\n');
-    int spaceIndex = input.indexOf(' ');
-    if (spaceIndex != -1) {
-      spd = input.substring(0, spaceIndex).toInt();
-      dist = input.substring(spaceIndex + 1).toFloat();
-      Serial.print(spd);
-      Serial.print("\t");
-      Serial.println(dist);
+    if (input == "1") {
+      Forward();
+    } else if (input == "2") {
+      Stop();
+      Backward();
+    } else if (input == "0") {
+      Stop();
     }
   }
-  Gas(spd, dist);
 }

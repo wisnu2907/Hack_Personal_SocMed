@@ -2,9 +2,9 @@
 #include <math.h>  // Include the math library for mathematical functions
 
 // Define constants for servo IDs, control pin, baud rate, and angle limits
-#define ID1 9u //mx1A
-#define ID2 10u //mx1B
-#define ID3 7u //mx2
+#define ID1 9u   //mx1A
+#define ID2 10u  //mx1B
+#define ID3 7u   //mx2
 // #define ID4 7u
 
 #define SERVO_ControlPin 7
@@ -98,7 +98,7 @@ void setup() {
   Dynamixel.setMode(ID1, SERVO, CW_LIMIT_ANGLE, CCW_LIMIT_ANGLE_MX);
   Dynamixel.setMode(ID2, SERVO, CW_LIMIT_ANGLE, CCW_LIMIT_ANGLE_MX);
   Dynamixel.setMode(ID3, SERVO, CW_LIMIT_ANGLE, CCW_LIMIT_ANGLE_AX);
-  Dynamixel.setMode(ID4, SERVO, CW_LIMIT_ANGLE, CCW_LIMIT_ANGLE_AX);
+  // Dynamixel.setMode(ID4, SERVO, CW_LIMIT_ANGLE, CCW_LIMIT_ANGLE_AX);
   joint1(tegak_mx - Deg(80), 512);
   joint2(tegak_mx + Deg(80), 512);
   joint3(tegak_mx + Deg(180), 512);
@@ -114,6 +114,8 @@ void loop() {
       float x = input.substring(0, spaceIndex).toFloat();
       float y = input.substring(spaceIndex + 1).toFloat();
       driveServo(x, y);
+      delay(250);
+      Serial.print("1");
     } else if (input == "Naik") {
       Dynamixel.servo(ID3, tegak_ax, 0x3FF);
     } else if (input == "Turun") {

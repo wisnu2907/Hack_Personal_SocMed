@@ -4,6 +4,7 @@
 #define pulse_rotation 1988  //
 #define d_wheel 15           // cm
 #define k_wheel (3.14 * 15)
+#define spd 8
 
 /*
    range speed -50 0 50
@@ -128,32 +129,12 @@ void com_agv_motor(int dSL, int dSR) {
   agv_motor(pwmL, pwmR);
 }
 
-void Forward() {
-  mErrL = 0;
-  mErrR = 0;
-  mdErrL = 0;
-  mdErrR = 0;
-  SpeedL = 0;
-  SpeedR = 0;
-  mLastL = 0;
-  mLastR = 0;
-  CountL = 0, CountR = 0;
-  delay(50);
-  com_agv_motor(6, 6);
+void Backward() {
+  com_agv_motor(spd, spd);
 }
 
-void Backward() {
-  mErrL = 0;
-  mErrR = 0;
-  mdErrL = 0;
-  mdErrR = 0;
-  SpeedL = 0;
-  SpeedR = 0;
-  mLastL = 0;
-  mLastR = 0;
-  CountL = 0, CountR = 0;
-  delay(50);
-  com_agv_motor(-6, -6);
+void Forward() {
+  com_agv_motor(-spd, -spd);
 }
 
 void Stop() {
@@ -183,19 +164,11 @@ void setup() {
 void loop() {
   //  Gas (20, 150);
   if (Serial.available() > 0) {
-    mErrL = 0;
-    mErrR = 0;
-    mdErrL = 0;
-    mdErrR = 0;
-    SpeedL = 0;
-    SpeedR = 0;
-    mLastL = 0;
-    mLastR = 0;
-    CountL = 0, CountR = 0;
     String input = Serial.readStringUntil('\n');
     if (input == "1") {
       Forward();
     } else if (input == "2") {
+      Stop();
       Backward();
     } else if (input == "0") {
       Stop();
