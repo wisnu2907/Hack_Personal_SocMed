@@ -82,8 +82,10 @@ while True:
     ratio_px_cm = 194 / 100
     
     if len(results[0].boxes) == 0:
-        Motor1.write("1".encode('utf-8'))
-        Motor2.write("1".encode('utf-8'))
+        # Motor1.write("1".encode('utf-8'))
+        # Motor2.write("1".encode('utf-8'))
+        Motor1.write(bytes([1]))
+        Motor2.write(bytes([1]))
         
     # Draw the detection results on the frame
     for box in results[0].boxes:
@@ -149,23 +151,31 @@ while True:
             (255, 255, 255),
             2,
         )
-        if center_x_cm > 4.0:
-            Motor1.write("1".encode('utf-8'))
-            Motor2.write("1".encode('utf-8'))
+        if center_x_cm >= 3.0:
+            # Motor1.write("1".encode('utf-8'))
+            # Motor2.write("1".encode('utf-8'))
+            Motor1.write(bytes([1]))
+            Motor2.write(bytes([1]))
         elif center_x_cm < 3.0 and center_x_cm > -3.0:
-            Motor1.write("0".encode('utf-8'))
-            Motor2.write("0".encode('utf-8'))
-        elif center_x_cm < -3.0:
-            Motor1.write("2".encode('utf-8'))
-            Motor2.write("2".encode('utf-8'))
+            # Motor1.write("0".encode('utf-8'))
+            # Motor2.write("0".encode('utf-8'))
+            Motor1.write(bytes([0]))
+            Motor2.write(bytes([0]))
+        elif center_x_cm <= -3.0:
+            # Motor1.write("2".encode('utf-8'))
+            # Motor2.write("2".encode('utf-8'))
+            Motor1.write(bytes([2]))
+            Motor2.write(bytes([2]))
 
     # Display the frame
     cv2.imshow("Astro_24", frame)
 
     # Exit if the user presses the 'q' keyP
     if cv2.waitKey(1) & 0xFF == ord("q"):
-        Motor1.write("0".encode('utf-8'))
-        Motor2.write("0".encode('utf-8'))
+        # Motor1.write("0".encode('utf-8'))
+        # Motor2.write("0".encode('utf-8'))
+        Motor1.write(bytes([0]))
+        Motor2.write(bytes([0]))
         break
     
 # Release the webcam and destroy all windows
