@@ -129,11 +129,11 @@ void com_agv_motor(int dSL, int dSR) {
   agv_motor(pwmL, pwmR);
 }
 
-void Backward(){
+void Backward() {
   com_agv_motor(spd, spd);
 }
 
-void Forward(){
+void Forward() {
   com_agv_motor(-spd, -spd);
 }
 
@@ -150,7 +150,7 @@ void Stop() {
   mLastL = 0;
   mLastR = 0;
   CountL = 0, CountR = 0;
-  delay(50);
+  delay(13);
 }
 
 // the setup function runs once when you press reset or power the board
@@ -164,13 +164,14 @@ void setup() {
 void loop() {
   //  Gas (20, 150);
   if (Serial.available() > 0) {
-    String input = Serial.readStringUntil('\n');
-    if (input == "1") {
+    int input = Serial.parseInt();
+    if (input == 1) {
       Forward();
-    } else if (input == "2") {
+    } else if (input == 2) {
+      // Stop();
       Stop();
       Backward();
-    } else if (input == "0") {
+    } else if (input == 0) {
       Stop();
     }
   }
