@@ -94,8 +94,8 @@ void com_agv_motor(int dSL, int dSR) {
   dRL = abs(myEncL.read());
   dRR = abs(myEncR.read());
 
-  CountL += (float)dRL / 42.2;
-  CountR += (float)dRR / 42.2;
+  CountL += (float)dRL / 49.852;
+  CountR += (float)dRR / 49.852;
 
   //42.2 = pulse_rotation/(k_wheel)
 
@@ -139,6 +139,10 @@ void Forward() {
   com_agv_motor(spd, spd);
 }
 
+void SlideL() {
+  com_agv_motor(-spd, spd);
+}
+
 void Stop() {
   com_agv_motor(0, 0);
   analogWrite(PWM_L, 0);
@@ -151,7 +155,6 @@ void Stop() {
   SpeedR = 0;
   mLastL = 0;
   mLastR = 0;
-  CountL = 0, CountR = 0;
   delay(13);
 }
 
@@ -168,6 +171,11 @@ void setup() {
   Serial.setTimeout(1);
   init_motor();
   pinMode(13, OUTPUT);
+
+  SlideL();
+  if (CountL >= 10 || CountR >= 10) {
+    Stop();
+  }
 
   while (!Serial) {
     ;
@@ -204,6 +212,7 @@ void TaskComm(void *pvParameters) {
   for (;;) {
     if (Serial.available() > 0) {
       input = Serial.readStringUntil('\n');
+      CountL = 0, CountR = 0;
     }
 
     vTaskDelay(1);
@@ -215,13 +224,19 @@ void TaskMotor(void *pvParameters)  // This is a task.
   (void)pvParameters;
 
   for (;;) {
-    if (input == "1") {
+    if (input == "2") {
       Forward();
-    } else if (input == "2") {
+    } else if (input == "1") {
       Backward();
     } else if (input == "0") {
       Stop();
-    }
+    } else if (input == "3") {
+      SlideL();
+      if (CountL >= 10 || CountR >= 10) {
+        Stop();
+      }
+    } else Stop();
+
     vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
   }
 }
