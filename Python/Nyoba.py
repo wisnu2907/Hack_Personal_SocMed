@@ -24,8 +24,8 @@ if device.type == "cuda":
     print("Cached:   ", round(torch.cuda.memory_reserved(0) / 1024**3, 1), "GB")
 
 cap = cv2.VideoCapture(0)  
-Motor1 = serial.Serial("COM8", 115200) #ID 10
-Motor2 = serial.Serial("COM7", 115200) #ID 11
+Motor1 = serial.Serial("COM8", 9600) #ID 10
+Motor2 = serial.Serial("COM7", 9600) #ID 11
 
 # Define the colors for the bounding boxes
 COLORS = [(0, 255, 0)]
@@ -57,6 +57,9 @@ if Motor2.is_open:
 
 # Open the serial port
 Motor2.open()
+
+Motor1.write("3".encode('utf-8'))
+Motor2.write("3".encode('utf-8'))
     
 while True:
     # Read a frame from the webcam
