@@ -1,10 +1,10 @@
-// rodikwahyuindrawan@gmail.com
-// @awgrobotic2023
+// wisnu.imam.satrio@gmail.com
+// @KRTMI2024
 
 #define pulse_rotation 1988  //
 #define d_wheel 15           // cm
 #define k_wheel (3.14 * 15)
-#define spd 8
+#define spd 5
 
 /*
    range speed -50 0 50
@@ -97,6 +97,8 @@ void com_agv_motor(int dSL, int dSR) {
   CountL += (float)dRL / 42.2;
   CountR += (float)dRR / 42.2;
 
+  //42.2 = pulse_rotation/(k_wheel)
+
   // Serial.print(CountL);
   // Serial.println(CountR);
 
@@ -130,11 +132,11 @@ void com_agv_motor(int dSL, int dSR) {
 }
 
 void Backward() {
-  com_agv_motor(spd, spd);
+  com_agv_motor(-spd, -spd);
 }
 
 void Forward() {
-  com_agv_motor(-spd, -spd);
+  com_agv_motor(spd, spd);
 }
 
 void Stop() {
@@ -150,28 +152,76 @@ void Stop() {
   mLastL = 0;
   mLastR = 0;
   CountL = 0, CountR = 0;
-  delay(50);
+  delay(13);
 }
+
+#include <Arduino_FreeRTOS.h>
+
+
+// define two tasks for Blink & AnalogRead
+void TaskComm(void *pvParameters);
+void TaskMotor(void *pvParameters);
 
 // the setup function runs once when you press reset or power the board
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.setTimeout(1);
   init_motor();
   pinMode(13, OUTPUT);
+
+  while (!Serial) {
+    ;
+  }
+
+  xTaskCreate(
+    TaskComm, "Comm"  // A name just for humans
+    ,
+    128  // This stack size can be checked & adjusted by reading the Stack Highwater
+    ,
+    NULL, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
+    ,
+    NULL);
+
+  xTaskCreate(
+    TaskMotor, "Motor", 128  // Stack size
+    ,
+    NULL, 1  // Priority
+    ,
+    NULL);
+
+  // Now the task scheduler, which takes over control of scheduling individual tasks, is automatically started.
 }
 
+
 void loop() {
-  //  Gas (20, 150);
-  if (Serial.available() > 0) {
-    String input = Serial.readStringUntil('\n');
+}
+
+String input;
+
+void TaskComm(void *pvParameters) {
+  (void)pvParameters;
+
+  for (;;) {
+    if (Serial.available() > 0) {
+      input = Serial.readStringUntil('\n');
+    }
+
+    vTaskDelay(1);
+  }
+}
+
+void TaskMotor(void *pvParameters)  // This is a task.
+{
+  (void)pvParameters;
+
+  for (;;) {
     if (input == "1") {
       Forward();
     } else if (input == "2") {
-      Stop();
       Backward();
     } else if (input == "0") {
       Stop();
     }
+    vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
   }
 }
