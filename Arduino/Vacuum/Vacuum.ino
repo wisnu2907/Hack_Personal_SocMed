@@ -1,66 +1,21 @@
-#define relay 7  // Define the pin for the relay
-#include <Arduino_FreeRTOS.h>
-
-void TaskComm(void *pvParameters);
-void TaskMotor(void *pvParameters);
+#define relay 23// Define the pin for the relay
 
 void setup() {
-  Serial.begin(9600);        
-  Serial.setTimeout(1);      
-  pinMode(relay, OUTPUT);    
-  digitalWrite(relay, LOW);
-
-  while (!Serial) {
-    ;
-  }
-
-  xTaskCreate(
-    TaskComm, "Comm"  // A name just for humans
-    ,
-    128  // This stack size can be checked & adjusted by reading the Stack Highwater
-    ,
-    NULL, 2  // Priority, with 3 (configMAX_PRIORITIES - 1) being the highest, and 0 being the lowest.
-    ,
-    NULL);
-
-  xTaskCreate(
-    TaskRly, "Relay"
-    , 
-    128  // Stack size
-    ,
-    NULL, 1  // Priority
-    ,
-    NULL);  
+  Serial.begin(9600);  // Initialize serial communication
+  // Serial.setTimeout(1); // Set timeout to 50 milliseconds
+  pinMode(relay, OUTPUT);     // Set the relay pin as an output
+  digitalWrite(relay, LOW);  // Set the relay to the default HIGH position
 }
 
 void loop() {
-
-}
-
-String input;
-
-void TaskComm(void *pvParameters) {
-  (void)pvParameters;
-
-  for (;;) {
-    if (Serial.available() > 0) {
-      input = Serial.readStringUntil('\n');
-    }
-
-    vTaskDelay(1);
-  }
-}
-
-void TaskMotor(void *pvParameters)  // This is a task.
-{
-  (void)pvParameters;
-
-  for (;;) {
+  if (Serial.available() > 0) {                   // Check if there is data available to read from serial
+    String input = Serial.readStringUntil('\n');  // Read the incoming data until newline character ('\n')
     if (input == "1") {
-      digitalWrite(relay, HIGH);
+      // Serial.println(input);     // Check if the received command is "Hisap"
+      digitalWrite(relay, HIGH);  // Set the relay to LOW
     } else if (input == "0") {
-      digitalWrite(relay, LOW);
-    } 
-    vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
+      // Serial.println(input);      // Check if the received command is "Lepas"
+      digitalWrite(relay, LOW);  // Set the relay to HIGH
+    }
   }
 }
