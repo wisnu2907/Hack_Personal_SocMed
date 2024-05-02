@@ -17,6 +17,7 @@ model.model.to(device)
 
 Motor1 = serial.Serial("COM8", 9600) #ID 10
 Motor2 = serial.Serial("COM7", 9600) #ID 11
+Mega = serial.Serial("COM14", 9600)
 
 if Motor1.is_open:
     Motor1.close()
@@ -25,6 +26,10 @@ Motor1.open()
 if Motor2.is_open:
     Motor2.close()
 Motor2.open()
+
+if Mega.is_open:
+    Mega.close()
+Mega.open()
 
 # setting device on GPU if available, else CPU)
 print("Using device:", device)
@@ -60,7 +65,7 @@ counter = 0
 detected_classes = []
 t1 = 0
 start_time = False
-
+sensor=0
 while True:
     # Read a frame from the webcam
     ret, frame = cap.read()
@@ -140,7 +145,17 @@ while True:
             if start_time and time.time()-t1>2.0:
                 counter+=1
                 start_time = False
-            cv2.putText(frame, f"PROSES AMBIL SAMPAH KE {counter}", (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
+                while True:
+                    sensor=Mega.read().decode("utf-8")
+                    if sensor=='H':
+                        Motor1.write("0".encode("utf-8"))
+                        Motor2.write("0".encode("utf-8"))
+                        time.sleep(3)
+                        break
+                    elif sensor=='P':
+                        Motor1.write("2".encode("utf-8"))
+                        Motor2.write("2".encode("utf-8"))
+            cv2.putText(frame, f"PROSES MENARUH SAMPAH KE {counter}", (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
 
     # Display the frame with counter
     cv2.putText(frame, f"Counter: {counter}", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2,)
