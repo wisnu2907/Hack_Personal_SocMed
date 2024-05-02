@@ -1,12 +1,16 @@
+#include <Arduino_FreeRTOS.h>
+
 #define vacum 23   // Define the pin for the relay
 #define relay1 7   // Define the pin for the relay
 #define relay2 11  // Define the pin for the relay
 #define relay3 15  // Define the pin for the relay
 #define relay4 19  // Define the pin for the relay
-
-
-
 int arr_senPin[] = { 38, 40, 42, 44, 46 };
+
+void TaskComm(void *pvParameters);
+void TaskSensor(void *pvParameters);
+void TaskRly(void *pvParameters);
+
 void init_relay() {
   pinMode(vacum, OUTPUT);
   pinMode(relay1, OUTPUT);
@@ -28,6 +32,12 @@ void relayTurun() {
   digitalWrite(relay3, HIGH);
   digitalWrite(relay4, HIGH);
 }
+void Hisap() {
+  digitalWrite(vacum, HIGH);
+}
+void Lepas() {
+  digitalWrite(vacum, LOW);
+}
 
 void init_sensor() {
   pinMode(arr_senPin[0], INPUT);
@@ -42,57 +52,75 @@ void setup() {
   Serial.setTimeout(1);
   init_relay();
   init_sensor();
+
+  xTaskCreate(
+    TaskComm, "Comm", 128, NULL, 2, NULL);
+
+  xTaskCreate(
+    TaskSensor, "Sensor", 128, NULL, 3, NULL);
+  xTaskCreate(
+    TaskRly, "Relay", 128, NULL, 1, NULL);
 }
 int arr_sens[5];
+
 void baca_sensor() {
   for (int i = 0; i < 5; i++) {
     arr_sens[i] = digitalRead(arr_senPin[i]);
     delay(5);
   }
-  // Serial.print(arr_sens[0]);
-  // Serial.print("\t");
-  // Serial.print(arr_sens[1]);
-  // Serial.print("\t");
-  // Serial.print(arr_sens[2]);
-  // Serial.print("\t");
-  // Serial.print(arr_sens[3]);
-  // Serial.print("\t");
-  // Serial.print(arr_sens[4]);
-  // Serial.print("\t\n");
 }
+
 String input;
-char kirim = 'A';
+
+char kirim1 = 'H';
+char kirim2 = 'P';
+
 void loop() {
-  // if (Serial.available() > 0) {
-  //   input = Serial.readStringUntil('\n');
-  baca_sensor();
-  if(arr_sens[0]==0 &&arr_sens[1]==0 &&arr_sens[2]==0 &&arr_sens[3]==0 &&arr_sens[4]==0){
-    Serial.print(kirim);
-  }
-  //   if (input == "1") {
-  //     digitalWrite(relay1, HIGH);
-  //     digitalWrite(relay2, LOW);
-  //     digitalWrite(relay3, LOW);
-  //     digitalWrite(relay4, LOW);
-  //   } else if (input == "2") {
-  //     digitalWrite(relay1, LOW);
-  //     digitalWrite(relay2, HIGH);
-  //     digitalWrite(relay3, LOW);
-  //     digitalWrite(relay4, LOW);
-  //   } else if (input == "3") {
-  //     digitalWrite(relay1, LOW);
-  //     digitalWrite(relay2, LOW);
-  //     digitalWrite(relay3, HIGH);
-  //     digitalWrite(relay4, LOW);
-  //   } else if (input == "4") {
-  //     digitalWrite(relay1, LOW);
-  //     digitalWrite(relay2, LOW);
-  //     digitalWrite(relay3, LOW);
-  //     digitalWrite(relay4, HIGH);
-  //   }
-  // }
-  // relayTurun();
-  // delay(2500);
-  // relayTurun();
-  // delay(2500);
 }
+
+void TaskComm(void *pvParameters) {
+  (void)pvParameters;
+
+  for (;;) {
+    if (Serial.available() > 0) {
+      input = Serial.readStringUntil('\n');
+      // Serial.print(input);
+    }
+    vTaskDelay(1);
+  }
+}
+
+void TaskSensor(void *pvParameters)  // This is a task.
+{
+  (void)pvParameters;
+
+  for (;;) {
+    baca_sensor(); 
+    if (arr_sens[0] == 0 && arr_sens[1] == 0 && arr_sens[2] == 0 && arr_sens[3] == 0 && arr_sens[4] == 0) {
+      Serial.print(kirim1);
+    }else{
+      Serial.print(kirim2); 
+    }
+
+    vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
+  }
+}
+void TaskRly(void *pvParameters)  // This is a task.
+{
+  (void)pvParameters;
+
+  for (;;) {
+    
+    if(input=="1"){
+      Hisap();
+    }
+    else if (input=="0"){
+      Lepas();
+    }
+    else{
+      Lepas();
+    }
+    vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
+  }
+}
+
