@@ -32,6 +32,14 @@ void relayTurun() {
   digitalWrite(relay3, HIGH);
   digitalWrite(relay4, HIGH);
 }
+
+void Stop() {
+  digitalWrite(relay1, LOW);
+  digitalWrite(relay2, LOW);
+  digitalWrite(relay3, HIGH);
+  digitalWrite(relay4, HIGH);
+}
+
 void Hisap() {
   digitalWrite(vacum, HIGH);
 }
@@ -72,9 +80,6 @@ void baca_sensor() {
 
 String input;
 
-char kirim1 = 'H';
-char kirim2 = 'P';
-
 void loop() {
 }
 
@@ -95,11 +100,13 @@ void TaskSensor(void *pvParameters)  // This is a task.
   (void)pvParameters;
 
   for (;;) {
-    baca_sensor(); 
+    baca_sensor();
     if (arr_sens[0] == 0 && arr_sens[1] == 0 && arr_sens[2] == 0 && arr_sens[3] == 0 && arr_sens[4] == 0) {
-      Serial.print(kirim1);
-    }else{
-      Serial.print(kirim2); 
+      Serial.println("1");
+      delay(10);
+    } else {
+      Serial.println("0");
+      delay(10);
     }
 
     vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
@@ -110,17 +117,18 @@ void TaskRly(void *pvParameters)  // This is a task.
   (void)pvParameters;
 
   for (;;) {
-    
-    if(input=="1"){
+
+    if (input == "1") {
       Hisap();
-    }
-    else if (input=="0"){
+    } else if (input == "2") {
       Lepas();
-    }
-    else{
-      Lepas();
-    }
-    vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
+    } else if (input == "3") {
+      relayTurun();
+    } else if (input == "4") {
+      relayNaik();
+    } else if (input == "0") {
+      Stop();
+
+      vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
   }
 }
-
