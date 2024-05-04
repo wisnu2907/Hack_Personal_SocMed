@@ -49,22 +49,19 @@ Mega.open()
 # setting device on GPU if available, else CPU)
 print("Using device:", device)
 
-# time.sleep(2)   
-# Motor1.write("3".encode('utf-8'))
-# Motor2.write("3".encode('utf-8'))
-# time.sleep(8.30)
-# Motor1.write("0".encode('utf-8'))
-# Motor2.write("0".encode('utf-8'))
+time.sleep(2)   
+Motor1.write("3".encode('utf-8'))
+Motor2.write("3".encode('utf-8'))
+time.sleep(8.30)
+Motor1.write("0".encode('utf-8'))
+Motor2.write("0".encode('utf-8'))
 
 logitune=True
 counter_tot = 0
 counter_sem = 0
 detected_classes = []
 t1 = 0
-t2 = 0
-t_s1=0
 start_time = False
-start_time2 = False
 sensor=0
 
 while True:
@@ -92,45 +89,25 @@ while True:
     if len(results[0].boxes) == 0 and counter_tot <5 and counter_sem == 0:
         Motor1.write("1".encode('utf-8'))
         Motor2.write("1".encode('utf-8'))  
-    elif len(results[0].boxes) == 0  and counter_tot <6 and counter_sem == 1:
+    elif len(results[0].boxes) == 0  and counter_tot <5 and counter_sem == 1:
         Motor1.write("2".encode('utf-8'))
         Motor2.write("2".encode('utf-8'))      
-        if sensor == "1" and not start_time2 :
-            Motor1.write("0".encode("utf-8"))   
-            Motor2.write("0".encode("utf-8"))
-            t2 = time.time()
-            start_time2 = True
-        if start_time2 and time.time()-t2>3.0:
-            counter_sem = 0
-            start_time2 = False        
-            # time.sleep(3)
-        # time.sleep(5)
-        elif start_time2 and time.time()-t2<=3.0:
-            Motor1.write("0".encode("utf-8"))   
-            Motor2.write("0".encode("utf-8"))
-            
-    elif len(results[0].boxes) == 0 and counter_tot <8 and counter_tot>5 and counter_sem == 0:
+    elif len(results[0].boxes) == 0 and counter_tot <5 and counter_sem == 1 and sensor == "1"  :
+        Motor1.write("0".encode("utf-8"))   
+        Motor2.write("0".encode("utf-8"))
+        time.sleep(5)
+        counter_sem = 0
+    elif len(results[0].boxes) == 0 and counter_tot >=5 and counter_sem == 0:
         Motor1.write("2".encode('utf-8'))
         Motor2.write("2".encode('utf-8'))  
-    elif len(results[0].boxes) == 0  and counter_tot <=8 and counter_tot>5 and counter_sem == 1:
+    elif len(results[0].boxes) == 0  and counter_tot >=5 and counter_sem == 1:
         Motor1.write("1".encode('utf-8'))
         Motor2.write("1".encode('utf-8'))      
-        if sensor == "1" and not start_time2 :
-            Motor1.write("0".encode("utf-8"))   
-            Motor2.write("0".encode("utf-8"))
-            t2 = time.time()
-            start_time2 = True
-        if start_time2 and time.time()-t2>3.0:
-            counter_sem = 0
-            start_time2 = False        
-            # time.sleep(3)
-        # time.sleep(5)
-        elif start_time2 and time.time()-t2<=3.0:
-            Motor1.write("0".encode("utf-8"))   
-            Motor2.write("0".encode("utf-8"))
-            
-        
-            
+    elif len(results[0].boxes) == 0 and counter_tot >=5 and counter_sem == 1  and sensor== "1":
+        Motor2.write("0".encode("utf-8"))   
+        Motor1.write("0".encode("utf-8"))
+        time.sleep(5)
+        counter_sem = 0
         
     # Draw the detection results on the frame
     for box in results[0].boxes:
@@ -168,7 +145,7 @@ while True:
         elif center_x_cm < 3.0 and center_x_cm > -3.0 :
             Motor1.write("0".encode('utf-8'))
             Motor2.write("0".encode('utf-8')) 
-            if class_name not in detected_classes and not start_time:
+            if (class_name not in detected_classes or class_name == "Botol") and not start_time and conf>0.7:
                 detected_classes.append(class_name)               
                 t1 = time.time()
                 print("nunggu 2detik")
