@@ -6,18 +6,33 @@ import numpy as np
 import serial.tools.list_ports
 import torch
 import serial
-from ultralytics import YOLO    
+from ultralytics import YOLO   
 
-# Initialize the YOLO model
-# model = YOLO("Python\\CV\\best.pt")
-# model = YOLO(r"C:\Users\wisnu\Coding\KRTMI2024\Python\best.pt")
-model = YOLO(r"C:\Users\wisnu\Downloads\best (1).pt")
+cap = cv2.VideoCapture(0)  
+cap.set(cv2.CAP_PROP_AUTOFOCUS, 1)
+
+# Define the colors for the bounding boxes
+COLORS = [(0, 255, 0)]
+
+# Load calibration settings if the file exists
+calibration_file = "calibration_settings.npz"
+if os.path.exists(calibration_file):
+    settings = np.load(calibration_file)
+    pts1 = settings["pts1"]
+    pts2 = settings["pts2"]
+    calibrated = True
+    print("Calibration settings loaded.")
+    
+else:
+    calibrated = False 
+
+model = YOLO(r"C:\Users\wisnu\Coding\KRTMI2024\Python\best.pt")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.model.to(device)
 
 Motor1 = serial.Serial("COM8", 9600) #ID 10
 Motor2 = serial.Serial("COM7", 9600) #ID 11
-Mega = serial.Serial("COM14", 9600)
+Mega = serial.Serial("COM12", 9600, timeout=1)
 
 if Motor1.is_open:
     Motor1.close()
@@ -34,39 +49,23 @@ Mega.open()
 # setting device on GPU if available, else CPU)
 print("Using device:", device)
 
-cap = cv2.VideoCapture(0)  
-
-# Define the colors for the bounding boxes
-COLORS = [(0, 255, 0)]
-
-logitune=True
-
-# Load calibration settings if the file exists
-calibration_file = "calibration_settings.npz"
-if os.path.exists(calibration_file):
-    settings = np.load(calibration_file)
-    pts1 = settings["pts1"]
-    pts2 = settings["pts2"]
-    calibrated = True
-    print("Calibration settings loaded.")
-    
-else:
-    calibrated = False
-    
+time.sleep(2)   
 Motor1.write("3".encode('utf-8'))
 Motor2.write("3".encode('utf-8'))
-time.sleep(15.8)
+time.sleep(8.30)
 Motor1.write("0".encode('utf-8'))
 Motor2.write("0".encode('utf-8'))
-# Motor1.write("d 3500".encode('utf-8'))
-# Motor2.write("d 3500".encode('utf-8'))
 
-counter = 0
+logitune=True
+counter_tot = 0
+counter_sem = 0
 detected_classes = []
 t1 = 0
 start_time = False
 sensor=0
+
 while True:
+    sensor=Mega.readline().decode().strip()
     # Read a frame from the webcam
     ret, frame = cap.read()
     if logitune:
@@ -87,19 +86,28 @@ while True:
     # ratio pixel to cm
     ratio_px_cm = 194 / 100
     
-    if len(results[0].boxes) == 0 and counter<5:
+    if len(results[0].boxes) == 0 and counter_tot <5 and counter_sem == 0:
         Motor1.write("1".encode('utf-8'))
-        Motor2.write("1".encode('utf-8'))    
-    elif len(results[0].boxes) == 0 and counter >=5:
+        Motor2.write("1".encode('utf-8'))  
+    elif len(results[0].boxes) == 0  and counter_tot <5 and counter_sem == 1:
         Motor1.write("2".encode('utf-8'))
-        Motor2.write("2".encode('utf-8'))
-        
-    # elif len(results[0].boxes) == 0 and counter >5:
-    #     Motor1.write("2".encode('utf-8'))
-    #     Motor2.write("2".encode('utf-8'))
-    # elif len(results[0].boxes) == 0 and counter >=10:
-    #     Motor1.write("0".encode('utf-8'))
-    #     Motor2.write("0".encode('utf-8'))
+        Motor2.write("2".encode('utf-8'))      
+    elif len(results[0].boxes) == 0 and counter_tot <5 and counter_sem == 1 and sensor == "1"  :
+        Motor1.write("0".encode("utf-8"))   
+        Motor2.write("0".encode("utf-8"))
+        time.sleep(5)
+        counter_sem = 0
+    elif len(results[0].boxes) == 0 and counter_tot >=5 and counter_sem == 0:
+        Motor1.write("2".encode('utf-8'))
+        Motor2.write("2".encode('utf-8'))  
+    elif len(results[0].boxes) == 0  and counter_tot >=5 and counter_sem == 1:
+        Motor1.write("1".encode('utf-8'))
+        Motor2.write("1".encode('utf-8'))      
+    elif len(results[0].boxes) == 0 and counter_tot >=5 and counter_sem == 1  and sensor== "1":
+        Motor2.write("0".encode("utf-8"))   
+        Motor1.write("0".encode("utf-8"))
+        time.sleep(5)
+        counter_sem = 0
         
     # Draw the detection results on the frame
     for box in results[0].boxes:
@@ -143,22 +151,13 @@ while True:
                 print("nunggu 2detik")
                 start_time = True
             if start_time and time.time()-t1>2.0:
-                counter+=1
+                counter_tot+=1
+                counter_sem = 1
                 start_time = False
-                while True:
-                    sensor=Mega.read().decode("utf-8")
-                    if sensor=='H':
-                        Motor1.write("0".encode("utf-8"))
-                        Motor2.write("0".encode("utf-8"))
-                        time.sleep(3)
-                        break
-                    elif sensor=='P':
-                        Motor1.write("2".encode("utf-8"))
-                        Motor2.write("2".encode("utf-8"))
-            cv2.putText(frame, f"PROSES MENARUH SAMPAH KE {counter}", (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
+            cv2.putText(frame, f"PROSES MENARUH SAMPAH KE {counter_tot}", (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
 
-    # Display the frame with counter
-    cv2.putText(frame, f"Counter: {counter}", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2,)
+    # Display the frame with counter_tot
+    cv2.putText(frame, f"Counter_tot: {counter_tot}", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2,)
     
     # Display the frame
     cv2.imshow("Astro_24", frame)
@@ -167,11 +166,15 @@ while True:
     if cv2.waitKey(1) & 0xFF == ord("q"):
         Motor1.write("0".encode('utf-8'))
         Motor2.write("0".encode('utf-8'))
+        Motor1.close()
+        Motor2.close()
+        Mega.close()
         break
     
 # Release the webcam and destroy all windows
 Motor1.close()
-cap.release()
 Motor2.close()
+Mega.close()
+cap.release()
 cv2.destroyAllWindows()
 exit()
