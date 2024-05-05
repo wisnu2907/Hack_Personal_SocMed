@@ -32,7 +32,8 @@ model.model.to(device)
 
 Motor1 = serial.Serial("COM8", 9600) #ID 10
 Motor2 = serial.Serial("COM7", 9600) #ID 11
-Mega = serial.Serial("COM12", 9600, timeout=1)
+Mega = serial.Serial("COM5", 9600, timeout=1)
+Arm = serial.Serial("COM3 ", 1000000)
 
 if Motor1.is_open:
     Motor1.close()
@@ -45,6 +46,11 @@ Motor2.open()
 if Mega.is_open:
     Mega.close()
 Mega.open()
+
+if Arm.is_open:
+    Arm.close()
+Arm.open()
+
 
 # setting device on GPU if available, else CPU)
 print("Using device:", device)
@@ -66,6 +72,19 @@ t_s1=0
 start_time = False
 start_time2 = False
 sensor=0
+class_name = ""
+
+def taruhSampah(class_name):
+    if class_name == "Ferro":
+        Arm.write("1".encode("utf-8"))
+    elif class_name == "Non-Ferro":
+        Arm.write("2".encode("utf-8"))
+    elif class_name == "Plastik-Biru" or class_name == "Plastik-Putih" or class_name == "Botol":
+        Arm.write("3".encode("utf-8"))
+    elif class_name == "Koran" or class_name == "Kertas-Bungkus":
+        Arm.write("4".encode("utf-8"))
+    elif class_name == "Daun-Fresh" or class_name == "Daun-Kering":
+        Arm.write("5".encode("utf-8"))
 
 while True:
     sensor=Mega.readline().decode().strip()
@@ -110,6 +129,7 @@ while True:
         elif start_time2 and time.time()-t2<=3.0:
             Motor1.write("0".encode("utf-8"))   
             Motor2.write("0".encode("utf-8"))
+            taruhSampah(class_name)
             
     elif len(results[0].boxes) == 0 and counter_tot <8 and counter_tot>5 and counter_sem == 0:
         Motor1.write("2".encode('utf-8'))
@@ -132,10 +152,8 @@ while True:
         elif start_time2 and time.time()-t2<=3.0:
             Motor1.write("0".encode("utf-8"))   
             Motor2.write("0".encode("utf-8"))
-            
-        
-            
-        
+            taruhSampah(class_name)
+                        
     # Draw the detection results on the frame
     for box in results[0].boxes:
         x1, y1, x2, y2 = box.xyxy[0]
@@ -149,12 +167,14 @@ while True:
         cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
 
         # Calculate and display the center coordinates in centimeters
-        center_x_cm = ((int((x1 + x2) / 2) - frame.shape[1] // 2) / ratio_px_cm / 10)  
+        # Calculate and display the center coordinates in centimeters relative to the bottom center
+        center_x_cm = ((int((x1 + x2) / 2) - frame.shape[1] // 2) / ratio_px_cm / 10) 
+        center_y_cm = ((frame.shape[0] - y2) / ratio_px_cm / 10)  
 
-        center_y_cm = (y1 / ratio_px_cm / 10)  
+        command = f"{center_x_cm + 25-14.5:.5f} {center_y_cm + 20-7.3-3.5:.5f}\n"
         
-        center_x = int((x1 + x2) / 2) - frame.shape[1] // 2
-        center_y = frame.shape[0] // 2 - int((y1 + y2) / 2)
+        # center_x = int((x1 + x2) / 2) - frame.shape[1] // 2
+        # center_y = frame.shape[0] // 2 - int((y1 + y2) / 2)
         cv2.circle(frame, (int(center_x_cm), int(center_y_cm)), 5, (0, 255, 255), -1)
 
         # Draw labelq
@@ -175,6 +195,7 @@ while True:
             if class_name not in detected_classes and not start_time and conf>0.7:
                 detected_classes.append(class_name)               
                 t1 = time.time()
+                Arm.write(command.encode("utf-8"))
                 print("nunggu 2detik")
                 start_time = True
             if start_time and time.time()-t1>2.0:
