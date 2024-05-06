@@ -4,7 +4,8 @@
 #define pulse_rotation 1988  //
 #define d_wheel 15           // cm
 #define k_wheel (3.14 * 15)
-#define spd 5
+#define spd 8
+#define spd2 5
 
 /*
    range speed -50 0 50
@@ -138,9 +139,16 @@ void Backward() {
 void Forward() {
   com_agv_motor(spd, spd);
 }
+void Backwardgt() {
+  com_agv_motor(-spd2, -spd2);
+}
+
+void Forwardgt() {
+  com_agv_motor(spd2, spd2);
+}
 
 void SlideL() {
-  com_agv_motor(-spd, spd);
+  com_agv_motor(11, -11);
 }
 
 void Stop() {
@@ -172,10 +180,7 @@ void setup() {
   init_motor();
   pinMode(13, OUTPUT);
 
-  SlideL();
-  if (CountL >= 10 || CountR >= 10) {
-    Stop();
-  }
+
 
   while (!Serial) {
     ;
@@ -224,17 +229,21 @@ void TaskMotor(void *pvParameters)  // This is a task.
   (void)pvParameters;
 
   for (;;) {
-    if (input == "2") {
+    if (input == "1") {
       Forward();
-    } else if (input == "1") {
+    } else if (input == "2") {
       Backward();
     } else if (input == "0") {
       Stop();
     } else if (input == "3") {
       SlideL();
-      if (CountL >= 10 || CountR >= 10) {
+      if (CountL >= 100 || CountR >= 100) {
         Stop();
       }
+    } else if (input == "4") {
+      Forwardgt();
+    } else if (input == "5") {
+      Backwardgt();
     } else Stop();
 
     vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
