@@ -68,9 +68,20 @@ counter_sem = 0
 detected_classes = []
 t1 = 0
 t2 = 0
-t_s1=0
+t3 = 0
+t4 = 0
+t5 = 0
+t6 = 0
+t7 = 0
+t8 = 0
 start_time = False
 start_time2 = False
+start_time3 = False
+start_time4 = False
+start_time5 = False
+start_time6 = False
+start_time7 = False
+start_time8 = False
 sensor=0
 class_name = ""
 
@@ -111,14 +122,34 @@ while True:
     if len(results[0].boxes) == 0 and counter_tot <5 and counter_sem == 0:
         Motor1.write("1".encode('utf-8'))
         Motor2.write("1".encode('utf-8'))
-        if counter_sem == 1:
+        if counter_sem == 1 and not start_time3:
             # fungsi arm ke koordinat sampah
+            t3 = time.time()
+            t4 = time.time()
+            t5 = time.time()
+            
+            start_time3 = True
+            
+        if  start_time3 and time.time()-t3>3.0:
+            start_time3 = False
+        elif start_time3 and time.time()-t3<=3.0:
             Mega.write("2".encode('utf-8'))
+            start_time4 = True
+
+        if  start_time4 and time.time()-t4>3.0:
+            start_time4 = False
+        elif start_time4 and time.time()-t4<=3.0:
             Mega.write("4".encode('utf-8'))
+            start_time5 = True
+
+        if  start_time5 and time.time()-t3>3.0:
+            start_time5 = False
+        elif start_time5 and time.time()-t3<=3.0:
             Mega.write("3".encode('utf-8'))
+        
     elif len(results[0].boxes) == 0  and counter_tot <6 and counter_sem == 1:
-        Motor1.write("2".encode('utf-8'))
-        Motor2.write("2".encode('utf-8'))      
+        Motor1.write("5".encode('utf-8'))
+        Motor2.write("5".encode('utf-8'))      
         if sensor == "1" and not start_time2 :
             Motor1.write("0".encode("utf-8"))   
             Motor2.write("0".encode("utf-8"))
@@ -141,14 +172,33 @@ while True:
     elif len(results[0].boxes) == 0 and counter_tot <8 and counter_tot>5 and counter_sem == 0:
         Motor1.write("2".encode('utf-8'))
         Motor2.write("2".encode('utf-8'))
-        if counter_sem == 1:
+        if counter_sem == 1 and not start_time3:
             # fungsi arm ke koordinat sampah
+            t6 = time.time()
+            t7 = time.time()
+            t8 = time.time()
+            
+            start_time3 = True
+            
+        if  start_time6 and time.time()-t6>3.0:
+            start_time6 = False
+        elif start_time6 and time.time()-t6<=3.0:
             Mega.write("2".encode('utf-8'))
+            start_time7 = True
+
+        if  start_time7 and time.time()-t7>3.0:
+            start_time7 = False
+        elif start_time7 and time.time()-t7<=3.0:
             Mega.write("4".encode('utf-8'))
+            start_time8 = True
+
+        if  start_time8 and time.time()-t8>3.0:
+            start_time8 = False
+        elif start_time8 and time.time()-t8<=3.0:
             Mega.write("3".encode('utf-8'))
     elif len(results[0].boxes) == 0  and counter_tot <=8 and counter_tot>5 and counter_sem == 1:
-        Motor1.write("1".encode('utf-8'))
-        Motor2.write("1".encode('utf-8'))      
+        Motor1.write("4".encode('utf-8'))
+        Motor2.write("4".encode('utf-8'))      
         if sensor == "1" and not start_time2 :
             Motor1.write("0".encode("utf-8"))   
             Motor2.write("0".encode("utf-8"))
