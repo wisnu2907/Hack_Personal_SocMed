@@ -16,8 +16,8 @@
 unsigned int tegak_mx = CCW_LIMIT_ANGLE_MX / 2;
 
 // Define the lengths of the links
-float L1 = 31.5;  // 10.4 cm
-float L2 = 33;    // 10.4 cm
+float L1 = 31.4;  // cm
+float L2 = 31.3;  // cm
 
 // Function to drive the servos based on x and y coordinates
 void driveServo(float x, float y) {
@@ -36,23 +36,24 @@ void driveServo(float x, float y) {
   // Also, set the speed for servo movement
   if (pos1 < 0 && pos2 > 0) {
     pos1 = (-1) * pos1;
-    joint1(tegak_mx - Deg(pos1), 0x3FF / 4);
-    joint2(tegak_mx + Deg(pos2), 0x3FF / 4);
+    joint1(tegak_mx - Deg(pos1), 0x3FF / 5);
+    joint2(tegak_mx + Deg(pos2), 0x3FF / 5);
     delay(5);
   } else if (pos1 > 0 && pos2 < 0) {
     pos2 = (-1) * pos2;
-    joint1(tegak_mx + Deg(pos1), 0x3FF / 4);
-    joint2(tegak_mx - Deg(pos2), 0x3FF / 4);
+    joint1(tegak_mx + Deg(pos1), 0x3FF / 5);
+    joint2(tegak_mx - Deg(pos2), 0x3FF / 5);
+
     delay(5);
   } else if (pos1 < 0 && pos2 < 0) {
     pos1 = (-1) * pos1;
     pos2 = (-1) * pos2;
-    joint1(tegak_mx + Deg(pos1), 0x3FF / 4);
-    joint2(tegak_mx + Deg(pos2), 0x3FF / 4);
+    joint1(tegak_mx + Deg(pos1), 0x3FF / 5);
+    joint2(tegak_mx + Deg(pos2), 0x3FF / 5);
     delay(5);
   } else if (pos1 > 0 && pos2 > 0) {
-    joint1(tegak_mx + Deg(pos1), 0x3FF / 4);
-    joint2(tegak_mx + Deg(pos2), 0x3FF / 4);
+    joint1(tegak_mx + Deg(pos1), 0x3FF / 5);
+    joint2(tegak_mx + Deg(pos2), 0x3FF / 5);
     delay(5);
   }
 }
@@ -82,23 +83,23 @@ void joint2(unsigned int pos2, int speed) {
 }
 
 void sampah1() {
-  driveServo(36.5, 53);
+  driveServo(36.5, 50.75);
 }
 
 void sampah2() {
-  driveServo(18, 59);
+  driveServo(20.5, 57);
 }
 
 void sampah3() {
-  driveServo(0, 61);
+  driveServo(0, 57);
 }
 
 void sampah4() {
-  driveServo(-19, 59);
+  driveServo(-20.5, 57);
 }
 
 void sampah5() {
-  driveServo(-36.5, 53);
+  driveServo(-36.5, 50.75);
 }
 
 // Setup function to initialize Serial communication and Dynamixel servos
@@ -107,20 +108,19 @@ void setup() {
   Serial.setTimeout(1);
   delay(500);
   pinMode(12, INPUT);
+  pinMode(13, OUTPUT);
   Dynamixel.begin(SERVO_SET_Baudrate, SERVO_ControlPin);
   Dynamixel.setMode(ID1, SERVO, CW_LIMIT_ANGLE, CCW_LIMIT_ANGLE_MX);
   Dynamixel.setMode(ID2, SERVO, CW_LIMIT_ANGLE, CCW_LIMIT_ANGLE_MX);
-  // sampah1();
-  // delay(2000);
-  // sampah2();
-  // delay(2000);
-  sampah3();
-  // delay(2000);
-  // sampah4();
-  // delay(2000);
-  // sampah5();
-  // delay(2000);
-  // driveServo(-6, y);
+  digitalWrite(13, HIGH);
+  delay(500);
+  digitalWrite(13, LOW);
+  delay(1000);
+  digitalWrite(13, HIGH);
+  delay(500);
+  digitalWrite(13, LOW);
+  joint1(tegak_mx - Deg(85), 200);
+  joint2(tegak_mx + Deg(170), 150);
 }
 
 /*
