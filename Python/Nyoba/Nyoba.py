@@ -110,7 +110,12 @@ while True:
     
     if len(results[0].boxes) == 0 and counter_tot <5 and counter_sem == 0:
         Motor1.write("1".encode('utf-8'))
-        Motor2.write("1".encode('utf-8'))  
+        Motor2.write("1".encode('utf-8'))
+        if counter_sem == 1:
+            # fungsi arm ke koordinat sampah
+            Mega.write("2".encode('utf-8'))
+            Mega.write("4".encode('utf-8'))
+            Mega.write("3".encode('utf-8'))
     elif len(results[0].boxes) == 0  and counter_tot <6 and counter_sem == 1:
         Motor1.write("2".encode('utf-8'))
         Motor2.write("2".encode('utf-8'))      
@@ -122,6 +127,7 @@ while True:
             t2 = time.time()
             start_time2 = True
         if start_time2 and time.time()-t2>3.0:
+            Mega.write("5".encode('utf-8'))
             counter_sem = 0
             start_time2 = False        
             # time.sleep(3)
@@ -129,11 +135,17 @@ while True:
         elif start_time2 and time.time()-t2<=3.0:
             Motor1.write("0".encode("utf-8"))   
             Motor2.write("0".encode("utf-8"))
+            Mega.write("6".encode('utf-8'))
             taruhSampah(class_name)
             
     elif len(results[0].boxes) == 0 and counter_tot <8 and counter_tot>5 and counter_sem == 0:
         Motor1.write("2".encode('utf-8'))
-        Motor2.write("2".encode('utf-8'))  
+        Motor2.write("2".encode('utf-8'))
+        if counter_sem == 1:
+            # fungsi arm ke koordinat sampah
+            Mega.write("2".encode('utf-8'))
+            Mega.write("4".encode('utf-8'))
+            Mega.write("3".encode('utf-8'))
     elif len(results[0].boxes) == 0  and counter_tot <=8 and counter_tot>5 and counter_sem == 1:
         Motor1.write("1".encode('utf-8'))
         Motor2.write("1".encode('utf-8'))      
@@ -145,6 +157,7 @@ while True:
             t2 = time.time()
             start_time2 = True
         if start_time2 and time.time()-t2>3.0:
+            Mega.write("5".encode('utf-8'))
             counter_sem = 0
             start_time2 = False        
             # time.sleep(3)
@@ -152,6 +165,7 @@ while True:
         elif start_time2 and time.time()-t2<=3.0:
             Motor1.write("0".encode("utf-8"))   
             Motor2.write("0".encode("utf-8"))
+            Mega.write("6".encode('utf-8'))
             taruhSampah(class_name)
                         
     # Draw the detection results on the frame
