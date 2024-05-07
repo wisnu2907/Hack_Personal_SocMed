@@ -75,6 +75,7 @@ sensor=0
 class_name = " "
 
 def otwSensor(spd):
+    global counter_sem
     Motor1.write(f"{spd}".encode('utf-8'))
     Motor2.write(f"{spd}".encode('utf-8'))      
     if sensor == "1" and not start_time2 :
@@ -83,7 +84,7 @@ def otwSensor(spd):
         if "Botol" in detected_classes:
             detected_classes.remove("Botol")
         t2 = time.time()
-        
+
         start_time2 = True
     if start_time2 and time.time()-t2>3.0:
         counter_sem = 0
