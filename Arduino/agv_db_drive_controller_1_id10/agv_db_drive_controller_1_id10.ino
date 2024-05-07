@@ -4,8 +4,11 @@
 #define pulse_rotation 1988  //
 #define d_wheel 15           // cm
 #define k_wheel (3.14 * 15)
-#define spd 8
-#define spd2 5
+#define spd1 5
+#define spd2 7
+#define spd3 8
+#define spd4 9
+#define spd5 10
 
 /*
    range speed -50 0 50
@@ -132,19 +135,44 @@ void com_agv_motor(int dSL, int dSR) {
   agv_motor(pwmL, pwmR);
 }
 
-void Backward() {
-  com_agv_motor(-spd, -spd);
+void Ba1() {
+  com_agv_motor(-spd1, -spd1);
 }
 
-void Forward() {
-  com_agv_motor(spd, spd);
-}
-void Backwardgt() {
+void B2() {
   com_agv_motor(-spd2, -spd2);
 }
 
-void Forwardgt() {
+void B3() {
+  com_agv_motor(-spd3, -spd3);
+}
+
+void B4() {
+  com_agv_motor(-spd4, -spd4);
+}
+
+void B5() {
+  com_agv_motor(-spd5, -spd5);
+}
+
+void F1() {
+  com_agv_motor(spd1, spd1);
+}
+
+void F2() {
   com_agv_motor(spd2, spd2);
+}
+
+void F3() {
+  com_agv_motor(spd3, spd3);
+}
+
+void F4() {
+  com_agv_motor(spd4, spd4);
+}
+
+void F5() {
+  com_agv_motor(spd5, spd5);
 }
 
 void SlideL() {
@@ -229,23 +257,26 @@ void TaskMotor(void *pvParameters)  // This is a task.
   (void)pvParameters;
 
   for (;;) {
-    if (input == "1") {
-      Forward();
-    } else if (input == "2") {
-      Backward();
-    } else if (input == "0") {
-      Stop();
-    } else if (input == "3") {
+    if (input == "1") F1();
+    else if (input == "2") F3();
+    else if (input == "3") F2();
+    else if (input == "4") F4();
+    else if (input == "5") F5();
+
+    else if (input == "A") Ba1();
+    else if (input == "B") B2();
+    else if (input == "C") B3();
+    else if (input == "D") B4();
+    else if (input == "E") B5();
+
+    else if (input == "0") Stop();
+
+    if (input == "6") {
       SlideL();
       if (CountL >= 100 || CountR >= 100) {
         Stop();
       }
-    } else if (input == "4") {
-      Forwardgt();
-    } else if (input == "5") {
-      Backwardgt();
-    } else Stop();
-
-    vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
+      vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
+    }
   }
 }
