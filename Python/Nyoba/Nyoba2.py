@@ -32,8 +32,12 @@ model.model.to(device)
 
 Motor1 = serial.Serial("COM8", 9600) #ID 10
 Motor2 = serial.Serial("COM7", 9600) #ID 11
-Mega = serial.Serial("COM5", 9600, timeout=1)
-Arm = serial.Serial("COM3 ", 1000000)
+Mega = serial.Serial("COM9", 9600, timeout=1)
+Arm = serial.Serial("COM3", 1000000)
+
+if Mega.is_open:
+    Mega.close()
+Mega.open()
 
 if Motor1.is_open:
     Motor1.close()
@@ -42,10 +46,6 @@ Motor1.open()
 if Motor2.is_open:
     Motor2.close()
 Motor2.open()
-
-if Mega.is_open:
-    Mega.close()
-Mega.open()
 
 if Arm.is_open:
     Arm.close()
@@ -72,7 +72,7 @@ t_s1=0
 start_time = False
 start_time2 = False
 sensor=0
-class_name = ""
+class_name = " "
 
 def taruhSampah(class_name):
     if class_name == "Ferro":
@@ -112,8 +112,8 @@ while True:
         Motor1.write("1".encode('utf-8'))
         Motor2.write("1".encode('utf-8'))  
     elif len(results[0].boxes) == 0  and counter_tot <6 and counter_sem == 1:
-        Motor1.write("2".encode('utf-8'))
-        Motor2.write("2".encode('utf-8'))      
+        Motor1.write("5".encode('utf-8'))
+        Motor2.write("5".encode('utf-8'))      
         if sensor == "1" and not start_time2 :
             Motor1.write("0".encode("utf-8"))   
             Motor2.write("0".encode("utf-8"))
@@ -135,8 +135,8 @@ while True:
         Motor1.write("2".encode('utf-8'))
         Motor2.write("2".encode('utf-8'))  
     elif len(results[0].boxes) == 0  and counter_tot <=8 and counter_tot>5 and counter_sem == 1:
-        Motor1.write("1".encode('utf-8'))
-        Motor2.write("1".encode('utf-8'))      
+        Motor1.write("4".encode('utf-8'))
+        Motor2.write("4".encode('utf-8'))      
         if sensor == "1" and not start_time2 :
             Motor1.write("0".encode("utf-8"))   
             Motor2.write("0".encode("utf-8"))
