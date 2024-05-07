@@ -4,7 +4,11 @@
 #define pulse_rotation 1988  //
 #define d_wheel 15           // cm
 #define k_wheel (3.14 * 15)
-#define spd 5
+#define spd1 5
+#define spd2 7
+#define spd3 8
+#define spd4 9
+#define spd5 10
 
 /*
    range speed -50 0 50
@@ -131,16 +135,49 @@ void com_agv_motor(int dSL, int dSR) {
   agv_motor(pwmL, pwmR);
 }
 
-void Backward() {
-  com_agv_motor(-spd, -spd);
+//----------FORWARD----------//
+void F1() {
+  com_agv_motor(spd1, spd1);
 }
 
-void Forward() {
-  com_agv_motor(spd, spd);
+void F2() {
+  com_agv_motor(spd2, spd2);
+}
+void F3() {
+  com_agv_motor(spd3, spd3);
+}
+
+void F4() {
+  com_agv_motor(spd4, spd4);
+}
+
+void F5() {
+  com_agv_motor(spd5, spd5);
+}
+
+//----------BACKWARD----------//
+void Ba1() {
+  com_agv_motor(-spd1, -spd1);
+}
+
+void B2() {
+  com_agv_motor(-spd2, -spd2);
+}
+
+void B3() {
+  com_agv_motor(-spd3, -spd3);
+}
+
+void B4() {
+  com_agv_motor(-spd4, -spd4);
+}
+
+void B5() {
+  com_agv_motor(-spd5, -spd5);
 }
 
 void SlideL() {
-  com_agv_motor(spd, -spd);
+  com_agv_motor(-11, 11);
 }
 
 void Stop() {
@@ -172,10 +209,7 @@ void setup() {
   init_motor();
   pinMode(13, OUTPUT);
 
-  SlideL();
-  if (CountL >= 10 || CountR >= 10) {
-    Stop();
-  }
+
 
   while (!Serial) {
     ;
@@ -224,19 +258,24 @@ void TaskMotor(void *pvParameters)  // This is a task.
   (void)pvParameters;
 
   for (;;) {
-    if (input == "2") {
-      Forward();
-    } else if (input == "1") {
-      Backward();
-    } else if (input == "0") {
-      Stop();
-    } else if (input == "3") {
+    if (input == "1") F1();
+    else if (input == "2") F2();
+    else if (input == "3") F3();
+    else if (input == "4") F4();
+    else if (input == "5") F5();
+    else if (input == "A") Ba1();
+    else if (input == "B") B2();
+    else if (input == "C") B3();
+    else if (input == "D") B4();
+    else if (input == "E") B5();
+    else if (input == "0") Stop();
+
+    if (input == "6") {
       SlideL();
-      if (CountL >= 10 || CountR >= 10) {
+      if (CountL >= 100 || CountR >= 100) {
         Stop();
       }
-    } else Stop();
-
-    vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
+      vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
+    }
   }
 }
