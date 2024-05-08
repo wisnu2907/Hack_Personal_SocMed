@@ -30,10 +30,10 @@ model = YOLO(r"C:\Users\wisnu\Coding\KRTMI2024\Python\best.pt")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.model.to(device)
 
-Motor1 = serial.Serial("COM8", 9600) #ID 10
-Motor2 = serial.Serial("COM7", 9600) #ID 11
-Mega = serial.Serial("COM5", 9600, timeout=1)
-Arm = serial.Serial("COM3 ", 1000000)
+Motor1  = serial.Serial("COM8", 9600) #ID 10
+Motor2  = serial.Serial("COM7", 9600) #ID 11
+Mega    = serial.Serial("COM5", 9600, timeout=1)
+Arm     = serial.Serial("COM3 ", 1000000)
 
 if Motor1.is_open:
     Motor1.close()
@@ -70,18 +70,10 @@ t1 = 0
 t2 = 0
 t3 = 0
 t4 = 0
-t5 = 0
-t6 = 0
-t7 = 0
-t8 = 0
 start_time = False
 start_time2 = False
 start_time3 = False
 start_time4 = False
-start_time5 = False
-start_time6 = False
-start_time7 = False
-start_time8 = False
 sensor=0
 class_name = ""
 
@@ -98,7 +90,7 @@ def taruhSampah(class_name):
         Arm.write("5".encode("utf-8"))
 
 while True:
-    sensor=Mega.readline().decode().strip()
+    sensor = Mega.readline().decode().strip()
     # Read a frame from the webcam
     ret, frame = cap.read()
     if logitune:
@@ -119,35 +111,24 @@ while True:
     # ratio pixel to cm
     ratio_px_cm = 194 / 100
     
-    if len(results[0].boxes) == 0 and counter_tot <5 and counter_sem == 0:
+    if len(results[0].boxes) == 0 and counter_tot <=5 and counter_sem == 0:
         Motor1.write("1".encode('utf-8'))
         Motor2.write("1".encode('utf-8'))
         if counter_sem == 1 and not start_time3:
             # fungsi arm ke koordinat sampah
             t3 = time.time()
-            t4 = time.time()
-            t5 = time.time()
-            
             start_time3 = True
-            
-        if  start_time3 and time.time()-t3>3.0:
-            start_time3 = False
-        elif start_time3 and time.time()-t3<=3.0:
+
+        if  start_time3 and time.time()-t3<=3.0:
             Mega.write("2".encode('utf-8'))
-            start_time4 = True
-
-        if  start_time4 and time.time()-t4>3.0:
-            start_time4 = False
-        elif start_time4 and time.time()-t4<=3.0:
+        elif start_time3 and time.time()-t3>3.0 and time.time()-t3<=6.0:
             Mega.write("4".encode('utf-8'))
-            start_time5 = True
-
-        if  start_time5 and time.time()-t3>3.0:
-            start_time5 = False
-        elif start_time5 and time.time()-t3<=3.0:
+        elif start_time3 and time.time()-t3>6.0 and time.time()-t3<=9.0:
             Mega.write("3".encode('utf-8'))
+        elif start_time3 and time.time()-t3>9.0:
+            start_time4 = False
         
-    elif len(results[0].boxes) == 0  and counter_tot <6 and counter_sem == 1:
+    elif len(results[0].boxes) == 0  and counter_tot <=5 and counter_sem == 1:
         Motor1.write("5".encode('utf-8'))
         Motor2.write("5".encode('utf-8'))      
         if sensor == "1" and not start_time2 :
@@ -169,14 +150,14 @@ while True:
             Mega.write("6".encode('utf-8'))
             taruhSampah(class_name)
             
+
+
     elif len(results[0].boxes) == 0 and counter_tot <8 and counter_tot>5 and counter_sem == 0:
         Motor1.write("2".encode('utf-8'))
         Motor2.write("2".encode('utf-8'))
         if counter_sem == 1 and not start_time3:
             # fungsi arm ke koordinat sampah
-            t6 = time.time()
-            t7 = time.time()
-            t8 = time.time()
+            t4 = time.time()
             
             start_time3 = True
             
@@ -196,6 +177,9 @@ while True:
             start_time8 = False
         elif start_time8 and time.time()-t8<=3.0:
             Mega.write("3".encode('utf-8'))
+
+
+
     elif len(results[0].boxes) == 0  and counter_tot <=8 and counter_tot>5 and counter_sem == 1:
         Motor1.write("4".encode('utf-8'))
         Motor2.write("4".encode('utf-8'))      
