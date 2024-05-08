@@ -2,6 +2,7 @@
 
 #define bt1 32
 #define bt2 34
+#define lmt 3
 #define vacum 23   // Define the pin for the relay
 #define relay1 7   // Define the pin for the relay
 #define relay2 11  // Define the pin for the relay
@@ -35,6 +36,7 @@ void init_sensor() {
 void init_bt() {
   pinMode(bt1, INPUT_PULLUP);
   pinMode(bt1, INPUT_PULLUP);
+  pinMode(lmt, INPUT_PULLUP);
 }
 
 // Fungsi-Fungsi yang ada di mega
@@ -74,7 +76,7 @@ void setup() {
   init_relay();
   init_sensor();
   init_bt();
-  pinMode(buzzer,OUTPUT);
+  pinMode(buzzer, OUTPUT);
 
   xTaskCreate(
     TaskComm, "Comm", 128, NULL, 2, NULL);
@@ -86,7 +88,7 @@ void setup() {
     TaskMega, "Relay", 128, NULL, 1, NULL);
 
   xTaskCreate(
-    Taskbt, "Button", 128, NULL, 0, NULL);
+    Taskbt, "Button", 128, NULL, 1, NULL);
 }
 int arr_sens[5];
 
@@ -108,7 +110,6 @@ void TaskComm(void *pvParameters) {
   for (;;) {
     if (Serial.available() > 0) {
       input = Serial.readStringUntil('\n');
-      Serial.print(input);
     }
     vTaskDelay(1);
   }
@@ -121,11 +122,11 @@ void TaskSensor(void *pvParameters)  // This is a task.
   for (;;) {
     baca_sensor();
     if (arr_sens[0] == 0 && arr_sens[1] == 0 && arr_sens[2] == 0 && arr_sens[3] == 0 && arr_sens[4] == 0) {
-      Serial.print("1");
-      delay(10);
+      Serial.println("1");
+      delay(5);
     } else {
-      Serial.print("0");
-      delay(10);
+      Serial.println("0");
+      delay(5);
     }
 
     vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
@@ -136,18 +137,12 @@ void TaskMega(void *pvParameters) {
   (void)pvParameters;
 
   for (;;) {
-    if (input == "2") {
-      Turun();
-    } else if (input == "3") {
-      Naik();
-    } else if (input == "4") {
+    if (input == "3") {
       Hisap();
-    } else if (input == "5") {
+    } else if (input == "4") {
       Lepas();
-    } else if (input == "6") {
-      stop();
     } else {
-      stop();
+      Lepas();
     }
     vTaskDelay(1);
   }
@@ -156,19 +151,37 @@ void TaskMega(void *pvParameters) {
 void Taskbt(void *pvParameters) {
   (void)pvParameters;
 
-  for(;;) {
-    if(digitalRead(bt1) == LOW && digitalRead(bt2) == HIGH){
+  for (;;) {
+    if (digitalRead(bt1) == LOW && digitalRead(bt2) == HIGH && digitalRead(lmt) == HIGH) {
       Naik();
-      Serial.println("naik");
       digitalWrite(buzzer, HIGH);
-    }else if(digitalRead(bt1) == HIGH && digitalRead(bt2) == LOW){
+    } else if (digitalRead(bt1) == LOW && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
+      Naik();
+      digitalWrite(buzzer, HIGH);
+    } else if (input == "1" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
+      Naik();
+    } else if (input == "1" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == HIGH) {
+      Naik();
+    } else if (digitalRead(bt1) == HIGH && digitalRead(bt2) == LOW && digitalRead(lmt) == HIGH) {
       Turun();
-      Serial.println("turun");
       digitalWrite(buzzer, HIGH);
-    }else{
+    } else if (input == "2" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == HIGH) {
+      Turun();
+    } else if (input == "2" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
+      stop();
+    } else if (digitalRead(bt1) == HIGH && digitalRead(bt2) == LOW && digitalRead(lmt) == LOW) {
       stop();
       digitalWrite(buzzer, LOW);
-      Serial.println("diam");
+    } else if (digitalRead(bt1) == LOW && digitalRead(bt2) == LOW && digitalRead(lmt) == LOW) {
+      stop();
+      digitalWrite(buzzer, LOW);
+    } else if (digitalRead(bt1) == LOW && digitalRead(bt2) == LOW && digitalRead(lmt) == HIGH) {
+      stop();
+      digitalWrite(buzzer, LOW);
+    } else {
+      stop();
+      digitalWrite(buzzer, LOW);
     }
+    vTaskDelay(1);
   }
 }
