@@ -130,12 +130,15 @@ while True:
     if len(results[0].boxes) == 0 and counter_tot <5 and not Grab:
         Motor1.write("5".encode('utf-8'))
         Motor2.write("5".encode('utf-8'))  
-        Mega.write("1".encode('UTF-8'))
-        Arm.write("0 7".encode("utf-8"))
+        Mega.write("2".encode('utf-8'))
+        Mega.write("2".encode('utf-8'))
+        Arm.write("3".encode('utf-8'))
     elif len(results[0].boxes) >= 0 and counter_tot <=5 and Grab :
         Motor1.write("E".encode('utf-8'))
         Motor2.write("E".encode('utf-8')) 
-        Mega.write("5".encode('UTF-8')) 
+        Mega.write("6".encode("UTF-8"))
+        Mega.write("6".encode("UTF-8"))
+        taruhSampah(detected_classes)
         if data == "1" and not start_time2 :
             Motor1.write("0".encode("utf-8"))   
             Motor2.write("0".encode("utf-8"))
@@ -154,7 +157,7 @@ while True:
             Motor1.write("0".encode("utf-8"))   
             Motor2.write("0".encode("utf-8"))
             taruhSampah(detected_classes)
-            Mega.write("4".encode("UTF-8"))
+            Mega.write("5".encode("UTF-8"))
     
     """
     Ini nanti dulu bang
@@ -224,21 +227,21 @@ while True:
                 t1 = time.time()
                 print("nunggu 2detik")
                 start_time = True
-            if start_time and time.time()-t1>5.7:
+            if start_time and time.time()-t1>3.7:
+                Mega.write("6".encode("UTF-8"))
+                Mega.write("6".encode("UTF-8"))
                 counter_tot+=1
                 Grab = True              
                 start_time = False
-                Mega.write("5".encode("UTF-8"))
                 taruhSampah(detected_classes)
             elif start_time and time.time()-t1<=2.5 :
-                Arm.write(command.encode("utf-8"))
-                Mega.write("2".encode("UTF-8"))
-            elif start_time and time.time()-t1>2.5 and time.time()-t1>=3.5:
-                Arm.write(command.encode("utf-8"))
                 Mega.write("3".encode("UTF-8"))
-            elif start_time and time.time()-t1>3.5 and time.time()-t1<=5.7:
                 Arm.write(command.encode("utf-8"))
-                Mega.write("5".encode("UTF-8"))
+            elif start_time and time.time()-t1>2.5 and time.time()-t1>=3.7:
+                Arm.write(command.encode("utf-8"))
+                Mega.write("6".encode("UTF-8"))
+                Mega.write("6".encode("UTF-8"))
+               
 
     # Display the frame with counter_tot
     cv2.putText(frame, f"Counter_tot: {counter_tot}", (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2,)
