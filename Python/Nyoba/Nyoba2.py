@@ -62,7 +62,7 @@ print("Using device:", device)
 # time.sleep(8.30)
 # Motor1.write("0".encode('utf-8'))
 # Motor2.write("0".encode('utf-8'))
-
+tegak = False
 logitune=True
 counter_tot = 0
 counter_sem = 0
@@ -124,9 +124,12 @@ while True:
     if len(results[0].boxes) == 0 and counter_tot <5 and counter_sem == 0:
         Motor1.write("1".encode('utf-8'))
         Motor2.write("1".encode('utf-8'))  
-    elif len(results[0].boxes) == 0  and counter_tot <5 and counter_sem == 1:
+    elif len(results[0].boxes) == 0  and counter_tot <=5 and counter_sem == 1:
         Motor1.write("A".encode('utf-8'))
-        Motor2.write("A".encode('utf-8'))      
+        Motor2.write("A".encode('utf-8')) 
+        if not tegak:
+            Arm.write("3".encode("utf-8")) 
+            tegak =True    
         if data == "1" and not start_time2 :
             Motor1.write("0".encode("utf-8"))   
             Motor2.write("0".encode("utf-8"))
@@ -136,7 +139,8 @@ while True:
             start_time2 = True
         if start_time2 and time.time()-t2>3.0:
             counter_sem = 0
-            start_time2 = False        
+            start_time2 = False
+            tegak = False        
             # time.sleep(3)
         # time.sleep(5)
         elif start_time2 and time.time()-t2<=3.0:
@@ -149,7 +153,8 @@ while True:
         Motor2.write("A".encode('utf-8'))  
     elif len(results[0].boxes) == 0  and counter_tot <=8 and counter_tot>5 and counter_sem == 1:
         Motor1.write("1".encode('utf-8'))
-        Motor2.write("1".encode('utf-8'))      
+        Motor2.write("1".encode('utf-8')) 
+        Arm.write("3".encode("utf-8"))     
         if data == "1" and not start_time2 :
             Motor1.write("0".encode("utf-8"))   
             Motor2.write("0".encode("utf-8"))
@@ -214,6 +219,7 @@ while True:
             if start_time and time.time()-t1>2.0:
                 counter_tot+=1
                 counter_sem = 1
+                
                 start_time = False
             cv2.putText(frame, f"PROSES MENARUH SAMPAH KE {counter_tot}", (30, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,0,0), 2)
 
