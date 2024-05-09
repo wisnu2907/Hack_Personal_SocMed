@@ -8,7 +8,7 @@
 #define spd2 7
 #define spd3 8
 #define spd4 9
-#define spd5 10
+#define spd5 26
 
 /*
    range speed -50 0 50
@@ -104,6 +104,7 @@ void com_agv_motor(int dSL, int dSR) {
   //42.2 = pulse_rotation/(k_wheel)
 
   // Serial.print(CountL);
+  // Serial.print("\t");
   // Serial.println(CountR);
 
   myEncL.write(0);
@@ -258,24 +259,28 @@ void TaskMotor(void *pvParameters)  // This is a task.
   (void)pvParameters;
 
   for (;;) {
+
     if (input == "1") F1();
     else if (input == "2") F2();
     else if (input == "3") F3();
     else if (input == "4") F4();
     else if (input == "5") F5();
+
     else if (input == "A") Ba1();
     else if (input == "B") B2();
     else if (input == "C") B3();
     else if (input == "D") B4();
     else if (input == "E") B5();
+
     else if (input == "0") Stop();
 
-    if (input == "6") {
+    else if (input == "6") {
       SlideL();
       if (CountL >= 100 || CountR >= 100) {
         Stop();
       }
-      vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
-    }
+      // one tick delay (15ms) in between reads for stability
+    } else Stop();
+    vTaskDelay(1);
   }
 }
