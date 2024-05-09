@@ -4,6 +4,7 @@ import time
 import cv2
 import numpy as np
 import serial.tools.list_ports
+import threading
 import torch
 import serial
 from ultralytics import YOLO   
@@ -32,12 +33,8 @@ model.model.to(device)
 
 Motor1 = serial.Serial("COM8", 9600) #ID 10
 Motor2 = serial.Serial("COM7", 9600) #ID 11
-Mega = serial.Serial("COM9", 9600, timeout=1)
-Arm = serial.Serial("COM3", 1000000)
-
-if Mega.is_open:
-    Mega.close()
-Mega.open()
+Mega = serial.Serial("COM5", 9600, timeout=1)
+Arm = serial.Serial("COM9", 1000000)
 
 if Motor1.is_open:
     Motor1.close()
@@ -46,6 +43,10 @@ Motor1.open()
 if Motor2.is_open:
     Motor2.close()
 Motor2.open()
+
+if Mega.is_open:
+    Mega.close()
+Mega.open()
 
 if Arm.is_open:
     Arm.close()
@@ -71,39 +72,35 @@ t2 = 0
 t_s1=0
 start_time = False
 start_time2 = False
-sensor=0
-class_name = " "
+data=0
+class_name = ""
 
-def otwSensor(spd):
-    global counter_sem
-    Motor1.write(f"{spd}".encode('utf-8'))
-    Motor2.write(f"{spd}".encode('utf-8'))      
-    if sensor == "1" and not start_time2 :
-        Motor1.write("0".encode("utf-8"))   
-        Motor2.write("0".encode("utf-8"))
-        if "Botol" in detected_classes:
-            detected_classes.remove("Botol")
-        t2 = time.time()
-
-        start_time2 = True
-    if start_time2 and time.time()-t2>3.0:
-        counter_sem = 0
-        start_time2 = False  
-
-def taruhSampah(class_name):
-    if class_name == "Ferro":
+def taruhSampah(detected):
+    if detected[-1] == "Ferro":
         Arm.write("1".encode("utf-8"))
-    elif class_name == "Non-Ferro":
+    elif detected[-1] == "Non-Ferro":
         Arm.write("2".encode("utf-8"))
-    elif class_name == "Plastik-Biru" or class_name == "Plastik-Putih" or class_name == "Botol":
+    elif detected[-1] == "Plastik-Biru" or detected[-1] == "Plastik-Putih" or detected[-1] == "Botol":
         Arm.write("3".encode("utf-8"))
-    elif class_name == "Koran" or class_name == "Kertas-Bungkus":
+    elif detected[-1] == "Koran" or detected[-1] == "Kertas-Bungkus":
         Arm.write("4".encode("utf-8"))
-    elif class_name == "Daun-Fresh" or class_name == "Daun-Kering":
+    elif detected[-1] == "Daun-Fresh" or detected[-1] == "Daun-Kering":
         Arm.write("5".encode("utf-8"))
 
+def baca_sensor():
+    global data
+    while True:
+        # Membaca data sensor dari Arduino
+        data = Mega.readline().decode().rstrip()
+        print("Data sensor:", data)
+        
+# Buat thread untuk membaca sensor
+thread_sensor = threading.Thread(target=baca_sensor)
+thread_sensor.daemon = True
+thread_sensor.start()
+
 while True:
-    sensor=Mega.readline().decode().strip()
+    # sensor=Mega.readline().decode().strip()
     # Read a frame from the webcam
     ret, frame = cap.read()
     if logitune:
@@ -124,81 +121,51 @@ while True:
     # ratio pixel to cm
     ratio_px_cm = 194 / 100
     
-    if len(results[0].boxes) == 0 and counter_tot ==0 and counter_sem == 0:
+    if len(results[0].boxes) == 0 and counter_tot <5 and counter_sem == 0:
         Motor1.write("1".encode('utf-8'))
         Motor2.write("1".encode('utf-8'))  
-    elif len(results[0].boxes) == 0 and counter_tot == 1 and counter_sem == 0:
-        Motor1.write("2".encode('utf-8'))
-        Motor2.write("2".encode('utf-8'))  
-    elif len(results[0].boxes) == 0 and counter_tot == 2 and counter_sem == 0:
-        Motor1.write("3".encode('utf-8'))
-        Motor2.write("3".encode('utf-8'))  
-    elif len(results[0].boxes) == 0 and counter_tot == 3 and counter_sem == 0:
-        Motor1.write("4".encode('utf-8'))
-        Motor2.write("4".encode('utf-8'))  
-    elif len(results[0].boxes) == 0 and counter_tot == 4 and counter_sem == 0:
-        Motor1.write("5".encode('utf-8'))
-        Motor2.write("5".encode('utf-8'))  
-    elif len(results[0].boxes) == 0 and counter_tot == 5 and counter_sem == 0:
+    elif len(results[0].boxes) == 0  and counter_tot <5 and counter_sem == 1:
+        Motor1.write("A".encode('utf-8'))
+        Motor2.write("A".encode('utf-8'))      
+        if data == "1" and not start_time2 :
+            Motor1.write("0".encode("utf-8"))   
+            Motor2.write("0".encode("utf-8"))
+            if "Botol" in detected_classes:
+                detected_classes.remove("Botol")
+            t2 = time.time()
+            start_time2 = True
+        if start_time2 and time.time()-t2>3.0:
+            counter_sem = 0
+            start_time2 = False        
+            # time.sleep(3)
+        # time.sleep(5)
+        elif start_time2 and time.time()-t2<=3.0:
+            Motor1.write("0".encode("utf-8"))   
+            Motor2.write("0".encode("utf-8"))
+            taruhSampah(detected_classes)
+            
+    elif len(results[0].boxes) == 0 and counter_tot <8 and counter_tot>5 and counter_sem == 0:
         Motor1.write("A".encode('utf-8'))
         Motor2.write("A".encode('utf-8'))  
-    elif len(results[0].boxes) == 0 and counter_tot == 6 and counter_sem == 0:
-        Motor1.write("B".encode('utf-8'))
-        Motor2.write("B".encode('utf-8'))  
-    elif len(results[0].boxes) == 0 and counter_tot == 7 and counter_sem == 0:
-        Motor1.write("C".encode('utf-8'))
-        Motor2.write("C".encode('utf-8'))  
-    # elif len(results[0].boxes) == 0 and counter_tot <4 and counter_sem == 0:
-    #     Motor1.write("4".encode('utf-8'))
-    #     Motor2.write("4".encode('utf-8'))  
-    # elif len(results[0].boxes) == 0 and counter_tot <5 and counter_sem == 0:
-    #     Motor1.write("5".encode('utf-8'))
-    #     Motor2.write("5".encode('utf-8'))  
-    
-    elif len(results[0].boxes) == 0  and counter_tot ==1 and counter_sem == 1:
-        otwSensor("A")
-    elif len(results[0].boxes) == 0  and counter_tot ==2 and counter_sem == 1:
-        otwSensor("A")
-    elif len(results[0].boxes) == 0  and counter_tot ==3 and counter_sem == 1:
-        otwSensor("A")
-    elif len(results[0].boxes) == 0  and counter_tot ==4 and counter_sem == 1:
-        otwSensor("A")
-    elif len(results[0].boxes) == 0  and counter_tot ==5 and counter_sem == 1:
-        otwSensor("A")
-    elif len(results[0].boxes) == 0  and counter_tot ==6 and counter_sem == 1:
-        otwSensor("1")
-    elif len(results[0].boxes) == 0  and counter_tot ==7 and counter_sem == 1:
-        otwSensor("1")
-    elif len(results[0].boxes) == 0  and counter_tot ==8 and counter_sem == 1:
-        otwSensor("1")
-    # elif len(results[0].boxes) == 0  and counter_tot ==4 and counter_sem == 1:
-    #     otwSensor("A")
-    # elif len(results[0].boxes) == 0  and counter_tot ==5 and counter_sem == 1:
-    #     otwSensor("A")
-        
-            
-    # elif len(results[0].boxes) == 0 and counter_tot <8 and counter_tot>5 and counter_sem == 0:
-    #     Motor1.write("2".encode('utf-8'))
-    #     Motor2.write("2".encode('utf-8'))  
-    # elif len(results[0].boxes) == 0  and counter_tot <=8 and counter_tot>5 and counter_sem == 1:
-    #     Motor1.write("4".encode('utf-8'))
-    #     Motor2.write("4".encode('utf-8'))      
-    #     if sensor == "1" and not start_time2 :
-    #         Motor1.write("0".encode("utf-8"))   
-    #         Motor2.write("0".encode("utf-8"))
-    #         if "Botol" in detected_classes:
-    #             detected_classes.remove("Botol")
-    #         t2 = time.time()
-    #         start_time2 = True
-    #     if start_time2 and time.time()-t2>3.0:
-    #         counter_sem = 0
-    #         start_time2 = False        
-    #         # time.sleep(3)
-    #     # time.sleep(5)
-    #     elif start_time2 and time.time()-t2<=3.0:
-    #         Motor1.write("0".encode("utf-8"))   
-    #         Motor2.write("0".encode("utf-8"))
-    #         taruhSampah(class_name)
+    elif len(results[0].boxes) == 0  and counter_tot <=8 and counter_tot>5 and counter_sem == 1:
+        Motor1.write("1".encode('utf-8'))
+        Motor2.write("1".encode('utf-8'))      
+        if data == "1" and not start_time2 :
+            Motor1.write("0".encode("utf-8"))   
+            Motor2.write("0".encode("utf-8"))
+            if "Botol" in detected_classes:
+                detected_classes.remove("Botol")
+            t2 = time.time()
+            start_time2 = True
+        if start_time2 and time.time()-t2>3.0:
+            counter_sem = 0
+            start_time2 = False        
+            # time.sleep(3)
+        # time.sleep(5)
+        elif start_time2 and time.time()-t2<=3.0:
+            Motor1.write("0".encode("utf-8"))   
+            Motor2.write("0".encode("utf-8"))
+            taruhSampah(class_name)
                         
     # Draw the detection results on the frame
     for box in results[0].boxes:
@@ -232,7 +199,7 @@ while True:
         cv2.putText(frame, f"Center (cm): ({center_x_cm:.3f} cm, {center_y_cm:.3f} cm)", (int(x1), int(y2) + label_size[1] + 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2,)
         cv2.putText(frame, f"Center (cm): ({center_x_cm:.3f} cm, {center_y_cm:.3f} cm)", (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2,)
         
-        if center_x_cm >= 3.1:
+        if center_x_cm > 4.0:
             Motor1.write("1".encode('utf-8'))
             Motor2.write("1".encode('utf-8'))
         elif center_x_cm < 3.0 and center_x_cm > -3.0 :
@@ -242,7 +209,6 @@ while True:
                 detected_classes.append(class_name)               
                 t1 = time.time()
                 Arm.write(command.encode("utf-8"))
-
                 print("nunggu 2detik")
                 start_time = True
             if start_time and time.time()-t1>2.0:
