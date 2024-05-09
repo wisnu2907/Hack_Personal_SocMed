@@ -162,18 +162,10 @@ void Taskbt(void *pvParameters) {
     } else if (digitalRead(bt1) == HIGH && digitalRead(bt2) == LOW && digitalRead(lmt) == LOW) {
       stop();
       digitalWrite(buzzer, LOW);
-    } else if (digitalRead(bt1) == LOW && digitalRead(bt2) == LOW && digitalRead(lmt) == LOW) {
-      stop();
-      digitalWrite(buzzer, LOW);
-    } else if (digitalRead(bt1) == LOW && digitalRead(bt2) == LOW && digitalRead(lmt) == HIGH) {
-      stop();
-      digitalWrite(buzzer, LOW);
     } else if (input == "4" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
       Hisap();
     } else if (input == "4" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == HIGH) {
       Hisap();
-    } else if (input == "5" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
-      Lepas();
     } else if (input == "5" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == HIGH) {
       Lepas();
     } else if (input == "6" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
