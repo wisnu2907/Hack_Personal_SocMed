@@ -123,7 +123,13 @@ while True:
     ratio_px_cm = 194 / 100
     
     '''
-    Proses mencari objek menggunakan kamera    
+    Proses mencari objek menggunakan kamera
+    mega_task :
+    2 = naik
+    3 = turun atau stop
+    4 = hisap
+    5 = lepas
+    6 = naik + hisap
     '''
     
     
