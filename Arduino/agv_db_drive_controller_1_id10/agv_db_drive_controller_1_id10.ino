@@ -274,7 +274,7 @@ void TaskMotor(void *pvParameters)  // This is a task.
 
     else if (input == "6") {
       SlideL();
-      if (CountL >= 100 || CountR >= 100) {
+      if (CountL >= 95 || CountR >= 95) {
         Stop();
       }
       // one tick delay (15ms) in between reads for stability
