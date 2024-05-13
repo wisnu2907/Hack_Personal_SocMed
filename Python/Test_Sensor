@@ -1,0 +1,38 @@
+import serial
+
+# Open serial connection
+Mega = serial.Serial('COM13', 9600)  # Change 'COMX' to your serial port
+Motor1 = serial.Serial("COM8", 9600)  # ID 10
+Motor2 = serial.Serial("COM7", 9600)  # ID 11
+
+if Motor1.is_open:
+    Motor1.close()
+Motor1.open()
+
+if Motor2.is_open:
+    Motor2.close()
+Motor2.open()
+
+if Mega.is_open:
+    Mega.close()
+Mega.open()
+
+while True:
+    if Mega.in_waiting > 0:
+        line = Mega.readline().decode('utf-8').rstrip()
+        received_array = list(map(int, line.split(',')))
+        # print("Received array:", received_array)
+
+        try:
+            if all(x == 1 for x in received_array[1:5]):
+                Motor1.write("a".encode('utf-8'))
+                Motor2.write("a".encode('utf-8'))
+            elif all(x == 0 for x in received_array[2:3]) or all(x == 0 for x in received_array[1:2]) or all(x == 0 for x in received_array[1:3]):
+                Motor1.write("b".encode('utf-8'))
+                Motor2.write("b".encode('utf-8'))
+            elif all(x == 0 for x in received_array[3:5]) or all(x == 0 for x in received_array[3:4]) or all(x == 0 for x in received_array[4:5]):
+                Motor1.write("c".encode('utf-8'))
+                Motor2.write("c".encode('utf-8'))
+        except serial.SerialException as e:
+            print("Serial Exception:", e)
+            break
