@@ -136,6 +136,18 @@ void com_agv_motor(int dSL, int dSR) {
   agv_motor(pwmL, pwmR);
 }
 
+void lf1(){
+  com_agv_motor(-5, -5);
+}
+
+void lf2(){
+  com_agv_motor(-3, -4);
+}
+
+void lf3(){
+  com_agv_motor(-4, -3);
+}
+
 //----------FORWARD----------//
 void F1() {
   com_agv_motor(spd1, spd1);
@@ -240,6 +252,7 @@ void loop() {
 }
 
 String input;
+int spdL, spdR;
 
 void TaskComm(void *pvParameters) {
   (void)pvParameters;
@@ -247,7 +260,12 @@ void TaskComm(void *pvParameters) {
   for (;;) {
     if (Serial.available() > 0) {
       input = Serial.readStringUntil('\n');
-      CountL = 0, CountR = 0;
+      // int spaceIndex = input.indexOf(' ');
+      // // CountL = 0, CountR = 0;
+      // if (spaceIndex != -1) {
+      //  spdL = input.substring(0, spaceIndex).toInt();
+      //  spdR = input.substring(spaceIndex + 1).toInt();
+      // }
     }
 
     vTaskDelay(1);
@@ -259,28 +277,31 @@ void TaskMotor(void *pvParameters)  // This is a task.
   (void)pvParameters;
 
   for (;;) {
+    if (input == "a") lf1();
+    else if (input == "b") lf2();
+    else if (input == "c") lf3();
+    // com_agv_motor(spdL, spdR);
+    // if (input == "1") F1();
+    // else if (input == "2") F2();
+    // else if (input == "3") F3();
+    // else if (input == "4") F4();
+    // else if (input == "5") F5();
 
-    if (input == "1") F1();
-    else if (input == "2") F2();
-    else if (input == "3") F3();
-    else if (input == "4") F4();
-    else if (input == "5") F5();
+    // else if (input == "A") Ba1();
+    // else if (input == "B") B2();
+    // else if (input == "C") B3();
+    // else if (input == "D") B4();
+    // else if (input == "E") B5();
 
-    else if (input == "A") Ba1();
-    else if (input == "B") B2();
-    else if (input == "C") B3();
-    else if (input == "D") B4();
-    else if (input == "E") B5();
+    // else if (input == "0") Stop();
 
-    else if (input == "0") Stop();
-
-    else if (input == "6") {
-      SlideL();
-      if (CountL >= 95 || CountR >= 95) {
-        Stop();
-      }
-      // one tick delay (15ms) in between reads for stability
-    } else Stop();
+    // else if (input == "6") {
+    //   SlideL();
+    //   if (CountL >= 100 || CountR >= 100) {
+    //     Stop();
+    //   }
+    //   // one tick delay (15ms) in between reads for stability
+    // } else Stop();
     vTaskDelay(1);
   }
 }
