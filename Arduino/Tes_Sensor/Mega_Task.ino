@@ -13,6 +13,7 @@ int arr_senPin[] = { 38, 40, 42, 44, 46 };
 
 void TaskComm(void *pvParameters);
 void TaskSensor(void *pvParameters);
+void TaskMega(void *pvParameters);
 void Taskbt(void *pvParameters);
 
 //inisiasi relay dan sensor
@@ -89,6 +90,9 @@ void setup() {
     TaskSensor, "Sensor", 128, NULL, 3, NULL);
 
   xTaskCreate(
+    TaskMega, "Relay", 128, NULL, 1, NULL);
+
+  xTaskCreate(
     Taskbt, "Button", 128, NULL, 1, NULL);
 }
 int arr_sens[5];
@@ -98,6 +102,16 @@ void baca_sensor() {
     arr_sens[i] = digitalRead(arr_senPin[i]);
     delay(5);
   }
+}
+
+void send_sensor_values() {
+  for (int i = 0; i < 5; i++) {
+    Serial.print(arr_sens[i]);
+    if (i < 4) {
+      Serial.print(",");
+    }
+  }
+  Serial.println();
 }
 
 String input;
@@ -120,21 +134,30 @@ void TaskComm(void *pvParameters) {
   }
 }
 
-void TaskSensor(void *pvParameters)  // This is a task.
-{
+void TaskSensor(void *pvParameters)  // This is a task.{
   (void)pvParameters;
 
   for (;;) {
     baca_sensor();
-    if (arr_sens[0] == 0 && arr_sens[1] == 0 && arr_sens[2] == 0 && arr_sens[3] == 0 && arr_sens[4] == 0) {
-      Serial.println("1");
-      delay(5);
-    } else {
-      Serial.println("0");
-      delay(5);
-    }
+    send_sensor_values();
+  }
 
-    vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
+  vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
+}
+}
+
+void TaskMega(void *pvParameters) {
+  (void)pvParameters;
+
+  for (;;) {
+    if (input == "3") {
+      Hisap();
+    } else if (input == "4") {
+      Lepas();
+    } else {
+      Lepas();
+    }
+    vTaskDelay(1);
   }
 }
 
@@ -148,29 +171,31 @@ void Taskbt(void *pvParameters) {
     } else if (digitalRead(bt1) == LOW && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
       Naik();
       digitalWrite(buzzer, HIGH);
-    } else if (input == "2" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
+    } else if (input == "1" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
       Naik();
-    } else if (input == "2" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == HIGH) {
+    } else if (input == "1" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == HIGH) {
       Naik();
     } else if (digitalRead(bt1) == HIGH && digitalRead(bt2) == LOW && digitalRead(lmt) == HIGH) {
       Turun();
       digitalWrite(buzzer, HIGH);
-    } else if (input == "3" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == HIGH) {
+    } else if (input == "2" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == HIGH) {
       Turun();
-    } else if (input == "3" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
+    } else if (input == "2" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
       stop();
     } else if (digitalRead(bt1) == HIGH && digitalRead(bt2) == LOW && digitalRead(lmt) == LOW) {
       stop();
       digitalWrite(buzzer, LOW);
-    } else if (input == "4" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
+    } else if (digitalRead(bt1) == LOW && digitalRead(bt2) == LOW && digitalRead(lmt) == LOW) {
+      stop();
+      digitalWrite(buzzer, LOW);
+    } else if (digitalRead(bt1) == LOW && digitalRead(bt2) == LOW && digitalRead(lmt) == HIGH) {
+      stop();
+      digitalWrite(buzzer, LOW);
+    } else if (input == "3" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
       Hisap();
     } else if (input == "4" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == HIGH) {
-      Hisap();
-    } else if (input == "5" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == HIGH) {
       Lepas();
-    } else if (input == "6" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == LOW) {
-      Sedot();
-    } else if (input == "6" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && digitalRead(lmt) == HIGH) {
+    } else if (input == "5" && digitalRead(bt1) == HIGH && digitalRead(bt2) == HIGH && (digitalRead(lmt) == LOW || digitalRead(lmt) == HIGH)) {
       Sedot();
     } else {
       stop();
