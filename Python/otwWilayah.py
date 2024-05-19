@@ -12,7 +12,10 @@ logitune = False
 turun = False
 objek_terdeteksi = False
 Sedot = False
-Arm = False
+Arms = False
+
+center_x_cm=0
+center_y_cm=0
 
 detected = []
 class_name = ""
@@ -41,8 +44,8 @@ if os.path.exists(calibration_file):
 else:
     calibrated = False
 
-Mega = serial.Serial("COM9", 9600)
-Arm = serial.Serial("COM16", 1000000)
+Mega = serial.Serial("COM12", 9600)
+Arm = serial.Serial("COM17", 1000000)
 
 if Mega.is_open:
     Mega.close()
@@ -53,16 +56,17 @@ if Arm.is_open:
 Arm.open()
 
 def taruhSampah(detected):
-    if detected[-1] == "Ferro":
-        Arm.write("1".encode("utf-8"))
-    elif detected[-1] == "Non-Ferro":
-        Arm.write("2".encode("utf-8"))
-    elif detected[-1] in ["Plastik-Biru", "Plastik-Putih", "Botol"]:
-        Arm.write("3".encode("utf-8"))
-    elif detected[-1] in ["Koran", "Kertas-Bungkus"]:
-        Arm.write("4".encode("utf-8"))
-    elif detected[-1] in ["Daun-Fresh", "Daun-Kering"]:
-        Arm.write("5".encode("utf-8"))
+    if detected:
+        if detected[-1] == "Ferro":
+            Arm.write("1".encode("utf-8"))
+        elif detected[-1] == "Non-Ferro":
+            Arm.write("2".encode("utf-8"))
+        elif detected[-1] in ["Plastik-Biru", "Plastik-Putih", "Botol"]:
+            Arm.write("3".encode("utf-8"))
+        elif detected[-1] in ["Koran", "Kertas-Bungkus"]:
+            Arm.write("4".encode("utf-8"))
+        elif detected[-1] in ["Daun-Fresh", "Daun-Kering"]:
+            Arm.write("5".encode("utf-8"))
 
 def baca_sensor():
     global data
@@ -130,11 +134,6 @@ def deteksi_objek():
                 COLORS,
                 2,
             )
-            
-        
-        # elif not objek_terdeteksi and not turun and not Sedot:
-        #     Arm.write("0 20\n".encode("utf-8"))
-        #     Mega.write("1\n".encode("utf-8"))
 
         cv2.imshow("Astro_24", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
@@ -150,19 +149,19 @@ thread_kamera.start()
 
 while True:
     if objek_terdeteksi:
-        if -3 < center_x_cm < 3 and not Arm:
+        if -3 < center_x_cm < 3 and not Arms:
             Arm.write(command.encode("utf-8"))
-            Arm = True
-        elif center_x_cm <= -3 or center_x_cm >= 3 and not Arm:
+            Arms = True
+        elif center_x_cm <= -3 or center_x_cm >= 3 and not Arms:
             Arm.write("0 20\n".encode("utf-8"))
-            Arm= False
-    elif not objek_terdeteksi and not Arm and not turun:
-        Mega.write("1\n".encode("UTF-8"))
-        turun = False
-        Arm.write("0 20\n".encode("utf-8"))
-        Arm = False
+            Arms = False
+    # elif not objek_terdeteksi and not Arms and not turun:
+    #     Mega.write("1\n".encode("UTF-8"))
+    #     turun = False
+    #     Arm.write("0 20\n".encode("utf-8"))
+    #     Arms = False
 
-    if Arm and not Sedot and not turun:
+    if Arms and not Sedot and not turun:
         Mega.write("2\n".encode("UTF-8"))
         turun = True
         time.sleep(3)
@@ -173,7 +172,7 @@ while True:
         time.sleep(1.2)
         Mega.write("4\n".encode("UTF-8"))
         Sedot = False
-        Arm = False
+        Arms = False
         turun = False
 
     if cv2.waitKey(1) & 0xFF == ord("q") or not thread_kamera.is_alive():
