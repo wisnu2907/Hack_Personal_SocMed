@@ -10,7 +10,7 @@
 #define buzzer 13
 #define lmtA 25
 
-int arr_senPin[9] = { 38, 40, 42, 46, 47, 45, 43, 41, 39 };
+int arr_senPin[10] = { 38, 40, 42, 44, 46, 47, 45, 43, 41, 39 };
 
 void TaskComm(void *pvParameters);
 void TaskSensor(void *pvParameters);
@@ -34,6 +34,7 @@ void init_sensor() {
   pinMode(arr_senPin[6], INPUT);
   pinMode(arr_senPin[7], INPUT);
   pinMode(arr_senPin[8], INPUT);
+  pinMode(arr_senPin[9], INPUT);
 }
 
 void init_bt() {
@@ -83,7 +84,7 @@ void setup() {
   init_relay();
   init_sensor();
   init_bt();
-  pinMode(buzzer, OUTPUT);
+  // pinMode(buzzer, OUTPUT);
   xTaskCreate(
     TaskComm, "Comm", 128, NULL, 2, NULL);
   xTaskCreate(
@@ -95,16 +96,16 @@ void setup() {
 int arr_sens[10];
 
 void baca_sensor() {
-  for (int i = 0; i < 9; i++) {
+  for (int i = 0; i < 10; i++) {
     arr_sens[i] = digitalRead(arr_senPin[i]);
     delay(5);
   }
 }
 
 void send_sensor_values() {
-  for (int i = 0; i < 9; i++) {
+  for (int i = 0; i < 10; i++) {
     Serial.print(arr_sens[i]);
-    if (i < 8) {
+    if (i < 9) {
       Serial.print(",");
     }
   }
@@ -176,6 +177,8 @@ void Taskbt(void *pvParameters) {
     } else if (tombolUp == HIGH && tombolDown == HIGH && limitBottom == HIGH && limitTop == LOW) {
       stop();
     } else if (tombolUp == LOW && tombolDown == LOW && limitBottom == HIGH && limitTop == LOW) {
+      stop();
+    } else if (tombolUp == LOW && tombolDown == HIGH && limitBottom == HIGH && limitTop == LOW) {
       stop();
     } else if (tombolUp == LOW && tombolDown == LOW && limitBottom == LOW && limitTop == HIGH) {
       stop();
