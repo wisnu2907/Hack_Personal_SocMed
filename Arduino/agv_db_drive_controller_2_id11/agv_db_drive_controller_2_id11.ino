@@ -136,16 +136,28 @@ void com_agv_motor(int dSL, int dSR) {
   agv_motor(pwmL, pwmR);
 }
 
-void lf1(){
-  com_agv_motor(-5, -5);
+void maju1() {
+  com_agv_motor(10, 10);
 }
 
-void lf2(){
-  com_agv_motor(-3, -4);
+void mundur1(){
+  com_agv_motor(-10, -10);
 }
 
-void lf3(){
-  com_agv_motor(-4, -3);
+void maju2() {
+  com_agv_motor(10, -4);
+}
+
+void mundur2(){
+  com_agv_motor(0, 0);
+}
+
+void maju3() {
+  com_agv_motor(-4, 10);
+}
+
+void mundur3(){
+  com_agv_motor(0, 0);
 }
 
 //----------FORWARD----------//
@@ -277,9 +289,19 @@ void TaskMotor(void *pvParameters)  // This is a task.
   (void)pvParameters;
 
   for (;;) {
-    if (input == "a") lf1();
-    else if (input == "b") lf2();
-    else if (input == "c") lf3();
+    if (input == "a") maju1();
+    else if (input == "b") maju2();
+    else if (input == "c") maju3();
+    else if (input == "d") Stop();
+    else if (input == "e") mundur1();
+    else if (input == "f") mundur2();
+    else if (input == "g") mundur3();
+    else if (input == "L") {
+      SlideL();
+      if (CountL >= 95 || CountR >= 95) {
+        Stop();
+      }
+    }
     // com_agv_motor(spdL, spdR);
     // if (input == "1") F1();
     // else if (input == "2") F2();
