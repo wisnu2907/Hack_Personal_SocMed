@@ -14,10 +14,12 @@ objek_terdeteksi = False
 Sedot = False
 Arms = False
 
+
 center_x_cm=0
 center_y_cm=0
 
 detected = []
+detected_sem=[]
 class_name = ""
 
 # Initialize the YOLO model
@@ -44,35 +46,35 @@ if os.path.exists(calibration_file):
 else:
     calibrated = False
 
-Mega = serial.Serial("COM12", 9600)
+Mega = serial.Serial("COM12", 9600, timeout=1)
 Arm = serial.Serial("COM17", 1000000)
-
-if Mega.is_open:
-    Mega.close()
-Mega.open()
 
 if Arm.is_open:
     Arm.close()
 Arm.open()
 
+if Mega.is_open:
+    Mega.close()
+Mega.open()
+
 def taruhSampah(detected):
     if detected:
-        if detected[-1] == "Ferro":
+        if detected[0] == "Ferro":
             Arm.write("1".encode("utf-8"))
-        elif detected[-1] == "Non-Ferro":
+        elif detected[0] == "Non-Ferro":
             Arm.write("2".encode("utf-8"))
-        elif detected[-1] in ["Plastik-Biru", "Plastik-Putih", "Botol"]:
+        elif detected[0] in ["Plastik-Biru", "Plastik-Putih", "Botol"]:
             Arm.write("3".encode("utf-8"))
-        elif detected[-1] in ["Koran", "Kertas-Bungkus"]:
+        elif detected[0] in ["Koran", "Kertas-Bungkus"]:
             Arm.write("4".encode("utf-8"))
-        elif detected[-1] in ["Daun-Fresh", "Daun-Kering"]:
+        elif detected[0] in ["Daun-Fresh", "Daun-Kering"]:
             Arm.write("5".encode("utf-8"))
 
 def baca_sensor():
     global data
     while True:
         data = Mega.readline().decode().rstrip()
-        print("Data sensor:", data)
+        # print("Data sensor:", data)
 
 def deteksi_objek():
     global turun, objek_terdeteksi, logitune, ret, frame, cap, class_name, detected, Sedot, center_x_cm, center_y_cm, command
@@ -103,8 +105,9 @@ def deteksi_objek():
             cls = box.cls[0]
             class_name = model.names[int(cls)]
             label = f"{class_name}: {conf:.3f}"
-            if class_name not in detected or class_name == "Botol":
-                detected.append(class_name)
+            # if class_name not in detected or class_name == "Botol":
+            detected.append(class_name)
+
 
             cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), COLORS, 2)
 
@@ -112,7 +115,7 @@ def deteksi_objek():
 
             center_x_cm = ((x1 + x2) / 2 - frame.shape[1] / 2) * ratio_px_cm
             center_y_cm = (frame.shape[0] - ((y1 + y2) / 2)) * ratio_px_cm
-            command = f"{center_x_cm + 23:.5f} {center_y_cm :.5f}\n"
+            command = f"{center_x_cm + 20:.5f} {center_y_cm+3 :.5f}\n"
 
             label_size, _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
             cv2.putText(
@@ -151,17 +154,21 @@ while True:
     if objek_terdeteksi:
         if -3 < center_x_cm < 3 and not Arms:
             Arm.write(command.encode("utf-8"))
+            time.sleep(1)
             Arms = True
         elif center_x_cm <= -3 or center_x_cm >= 3 and not Arms:
             Arm.write("0 20\n".encode("utf-8"))
+            Mega.write("1\n".encode("UTF-8"))
             Arms = False
-    # elif not objek_terdeteksi and not Arms and not turun:
+    # else :
     #     Mega.write("1\n".encode("UTF-8"))
     #     turun = False
     #     Arm.write("0 20\n".encode("utf-8"))
     #     Arms = False
 
     if Arms and not Sedot and not turun:
+        Arm.write(command.encode("utf-8"))
+
         Mega.write("2\n".encode("UTF-8"))
         turun = True
         time.sleep(3)
@@ -169,7 +176,9 @@ while True:
         Sedot = True
         time.sleep(2.6)
         taruhSampah(detected)
-        time.sleep(1.2)
+        
+        time.sleep(1.5)
+        detected.clear()
         Mega.write("4\n".encode("UTF-8"))
         Sedot = False
         Arms = False
