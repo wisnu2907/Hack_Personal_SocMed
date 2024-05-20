@@ -1,9 +1,10 @@
 import serial
 import time
+import threading
 
 # Open serial connection
 Mega = serial.Serial('COM17', 9600, timeout=1)  # Change 'COMX' to your serial port
-Motor1 = serial.Serial("COM11", 9600)  # ID 10
+Motor1 = serial.Serial('COM11', 9600)  # ID 10
 Motor2 = serial.Serial('COM14', 9600)  # ID 11
 
 if Motor1.is_open:
@@ -20,12 +21,12 @@ if Mega.is_open:
     Mega.close()
 Mega.open()
 
-previous_time = time.time()
+# previous_time = time.time()
  
 time.sleep(2)  
-Motor1.write("L".encode('utf-8'))
-Motor2.write("L".encode('utf-8'))
-time.sleep(7.30)
+# Motor1.write("L".encode('utf-8'))
+# Motor2.write("L".encode('utf-8'))
+# time.sleep(5.20)
 Motor1.write("d".encode('utf-8'))
 Motor2.write("d".encode('utf-8'))
 
@@ -190,8 +191,8 @@ def kondisiMundur():
             Motor1.write("d".encode('utf-8'))
             Motor2.write("d".encode('utf-8'))
         else :
-            Motor1.write("a".encode('utf-8'))
-            Motor2.write("a".encode('utf-8'))
+            Motor1.write("e".encode('utf-8'))
+            Motor2.write("e".encode('utf-8'))
 
 while True:
         line = Mega.readline().decode().rstrip()
@@ -229,6 +230,6 @@ while True:
         # 1 1 1 1 0 0 1 1 1
         # 1 1 1 1 1 0 1 1 1
         
-        kondisiMaju()
+        kondisiMundur()
 
         
