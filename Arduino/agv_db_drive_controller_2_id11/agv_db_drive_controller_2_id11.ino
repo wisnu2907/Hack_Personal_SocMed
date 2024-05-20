@@ -144,6 +144,10 @@ void mundur1(){
   com_agv_motor(-15, -15);
 }
 
+void mundur1a(){
+  com_agv_motor(-12, -12);
+}
+
 void maju2() {
   com_agv_motor(14, -6);
 }
@@ -294,8 +298,11 @@ void TaskMotor(void *pvParameters)  // This is a task.
     else if (input == "c") maju3();
     else if (input == "d") Stop();
     else if (input == "e") mundur1();
+    else if (input == "h") mundur1a();
     else if (input == "f") mundur2();
     else if (input == "g") mundur3();
+    else if (input == "1") F1();
+    else if (input == "2") Ba1();
     else if (input == "L") {
       SlideL();
       if (CountL >= 95 || CountR >= 95) {
@@ -304,8 +311,6 @@ void TaskMotor(void *pvParameters)  // This is a task.
     }else Stop();
     // com_agv_motor(spdL, spdR);
     // if (input == "1") F1();
-    // else if (input == "2") F2();
-    // else if (input == "3") F3();
     // else if (input == "4") F4();
     // else if (input == "5") F5();
 
