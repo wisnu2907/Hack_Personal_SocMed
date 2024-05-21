@@ -152,19 +152,31 @@ void maju3() {
   com_agv_motor(0, 0);
 }
 
-void mundur1(){
+void mundur1() {
   com_agv_motor(-16, -16);
 }
 
-void mundur1a(){
+void mundur1a() {
   com_agv_motor(-11, -11);
 }
 
-void mundur2(){
+void mundur2() {
+  com_agv_motor(-5, 5);
+}
+
+void mundur2a() {
   com_agv_motor(-6, 6);
 }
 
-void mundur3(){
+void mundur2b() {
+  com_agv_motor(-7, 7);
+}
+
+void mundur3() {
+  com_agv_motor(5, -5);
+}
+
+void mundur3a() {
   com_agv_motor(6, -6);
 }
 
@@ -172,7 +184,7 @@ void F1() {
   com_agv_motor(5, 5);
 }
 
-void Ba1(){
+void Ba1() {
   com_agv_motor(-5, -5);
 }
 
@@ -266,13 +278,25 @@ void TaskMotor(void *pvParameters)  // This is a task.
   for (;;) {
     if (input == "a") maju1();
     else if (input == "i") maju1a();
+
     else if (input == "b") maju2();
-    else if (input == "c") maju3();
-    else if (input == "d") Stop();
-    else if (input == "e") mundur1();
-    else if (input == "h") mundur1a();
-    else if (input == "f") mundur2();
-    else if (input == "g") mundur3();
+    else if (input == "c") maju2();
+    else if (input == "d") maju2();
+
+    else if (input == "e") maju3();
+
+    else if (input == "s") Stop();
+
+    else if (input == "z") mundur1();
+    else if (input == "y") mundur1a();
+
+    else if (input == "x") mundur2();
+    else if (input == "w") mundur2a();
+    else if (input == "v") mundur2b();
+
+    else if (input == "u") mundur3();
+    else if (input == "t") mundur3a();
+
     else if (input == "1") F1();
     else if (input == "2") Ba1();
     else if (input == "L") {
@@ -280,7 +304,7 @@ void TaskMotor(void *pvParameters)  // This is a task.
       if (CountL >= 95 || CountR >= 95) {
         Stop();
       }
-    }else Stop();
+    } else Stop();
     // com_agv_motor(spdL, spdR);
     // if (input == "1") F1();
     // else if (input == "3") F2();
