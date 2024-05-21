@@ -137,71 +137,43 @@ void com_agv_motor(int dSL, int dSR) {
 }
 
 void maju1() {
-  com_agv_motor(15, 15);
+  com_agv_motor(16, 16);
 }
 
-void mundur1(){
-  com_agv_motor(-15, -15);
-}
-
-void mundur1a(){
-  com_agv_motor(-12, -12);
+void maju1a() {
+  com_agv_motor(11, 11);
 }
 
 void maju2() {
   com_agv_motor(0, 0);
 }
 
-void mundur2(){
-  com_agv_motor(-14, 6);
-}
-
 void maju3() {
   com_agv_motor(0, 0);
 }
 
+void mundur1(){
+  com_agv_motor(-16, -16);
+}
+
+void mundur1a(){
+  com_agv_motor(-11, -11);
+}
+
+void mundur2(){
+  com_agv_motor(-6, 6);
+}
+
 void mundur3(){
-  com_agv_motor(6, -14);
-}
-
-void Ba1() {
-  com_agv_motor(-spd1, -spd1);
-}
-
-void B2() {
-  com_agv_motor(-spd2, -spd2);
-}
-
-void B3() {
-  com_agv_motor(-spd3, -spd3);
-}
-
-void B4() {
-  com_agv_motor(-spd4, -spd4);
-}
-
-void B5() {
-  com_agv_motor(-spd5, -spd5);
+  com_agv_motor(6, -6);
 }
 
 void F1() {
-  com_agv_motor(spd1, spd1);
+  com_agv_motor(5, 5);
 }
 
-void F2() {
-  com_agv_motor(spd2, spd2);
-}
-
-void F3() {
-  com_agv_motor(spd3, spd3);
-}
-
-void F4() {
-  com_agv_motor(spd4, spd4);
-}
-
-void F5() {
-  com_agv_motor(spd5, spd5);
+void Ba1(){
+  com_agv_motor(-5, -5);
 }
 
 void SlideL() {
@@ -293,6 +265,7 @@ void TaskMotor(void *pvParameters)  // This is a task.
 
   for (;;) {
     if (input == "a") maju1();
+    else if (input == "i") maju1a();
     else if (input == "b") maju2();
     else if (input == "c") maju3();
     else if (input == "d") Stop();
