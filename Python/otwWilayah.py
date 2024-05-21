@@ -49,7 +49,7 @@ else:
     calibrated = False
 
 Mega = serial.Serial("COM9", 9600)
-Arm = serial.Serial("COM18", 1000000)
+Arm = serial.Serial("COM5", 1000000)
 Motor1 = serial.Serial("COM8", 9600) #ID 10
 Motor2 = serial.Serial("COM7", 9600) #ID 11
 
@@ -279,8 +279,8 @@ def kondisiMundur():
         Motor2.write("f".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
-            received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
-            received_array[6] == 0   and received_array[7] == 1 and received_array[8] == 1 and 
+            received_array[3] == 1 and received_array[4] == 1 and received_array[5] == 0 and 
+            received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 1 and 
             received_array[9] == 1):
         #1 1 1 1 1 0 0 0 1 1
         Motor1.write("f".encode('utf-8'))
@@ -656,12 +656,13 @@ while True:
             Motor2.write("1".encode('utf-8')) 
             Arms = False 
         elif center_x_cm <= 3  and center_x_cm >= -3 and not Sedot and not Arms and count_tot < 5:
-            detected.append(class_name)
             stop()
             Arm.write(command.encode("utf-8"))
             time.sleep(1)
             Arms = True
             if Arms and not Sedot and not turun and count_tot < 5:
+                time.sleep(0.7)
+                detected.append(class_name)
                 Arm.write(command.encode("utf-8"))
                 time.sleep(0.3)
                 Mega.write("2\n".encode("UTF-8"))
