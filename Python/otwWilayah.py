@@ -207,50 +207,51 @@ def kondisiMaju():
             received_array[6] == 0   and received_array[7] == 1 and received_array[8] == 1 and 
             received_array[9] == 1):
         #1 1 1 1 1 0 0 0 1 1
-        Motor1.write("b".encode('utf-8'))
-        Motor2.write("b".encode('utf-8'))
+        Motor1.write("c".encode('utf-8'))
+        Motor2.write("c".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 1 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 1 1 1 0 0 0 0
-        Motor1.write("b".encode('utf-8'))
-        Motor2.write("b".encode('utf-8'))
+        Motor1.write("d".encode('utf-8'))
+        Motor2.write("d".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 1 0 0 0 0 0
-        Motor1.write("b".encode('utf-8'))
-        Motor2.write("b".encode('utf-8'))
+        Motor1.write("d".encode('utf-8'))
+        Motor2.write("d".encode('utf-8'))
         tengah = False
+
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 1 0 0 1 1 1 1 1
-        Motor1.write("c".encode('utf-8'))
-        Motor2.write("c".encode('utf-8'))
+        Motor1.write("e".encode('utf-8'))
+        Motor2.write("e".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 0 0 0 1 1 1 1
-        Motor1.write("c".encode('utf-8'))
-        Motor2.write("c".encode('utf-8'))
+        Motor1.write("e".encode('utf-8'))
+        Motor2.write("e".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 1 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 0 0 1 1 1 1 1
-        Motor1.write("c".encode('utf-8'))
-        Motor2.write("c".encode('utf-8'))
+        Motor1.write("e".encode('utf-8'))
+        Motor2.write("e".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 1 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 1 1 1 1 1 1 1 1
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = False
 
     else :
@@ -267,59 +268,60 @@ def kondisiMundur():
         received_array[6] == 1 and received_array[7] == 1 and received_array[8] == 1 and 
         received_array[9] == 1):
         #1 1 1 0 0 0 1 1 1 1 
-        Motor1.write("e".encode('utf-8'))
-        Motor2.write("e".encode('utf-8'))
+        Motor1.write("z".encode('utf-8'))
+        Motor2.write("z".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 1 and received_array[8] == 1 and 
             received_array[9] == 1):
         #1 1 1 1 0 0 0 1 1 1
-        Motor1.write("f".encode('utf-8'))
-        Motor2.write("f".encode('utf-8'))
+        Motor1.write("x".encode('utf-8'))
+        Motor2.write("x".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 1 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 1 and 
             received_array[9] == 1):
         #1 1 1 1 1 0 0 0 1 1
-        Motor1.write("f".encode('utf-8'))
-        Motor2.write("f".encode('utf-8'))
+        Motor1.write("w".encode('utf-8'))
+        Motor2.write("w".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 1 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 1 1 1 0 0 0 0
-        Motor1.write("f".encode('utf-8'))
-        Motor2.write("f".encode('utf-8'))
+        Motor1.write("v".encode('utf-8'))
+        Motor2.write("v".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 1 0 0 0 0 0
-        Motor1.write("f".encode('utf-8'))
-        Motor2.write("f".encode('utf-8'))
+        Motor1.write("v".encode('utf-8'))
+        Motor2.write("v".encode('utf-8'))
         tengah = False
+
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 1 0 0 1 1 1 1 1
-        Motor1.write("g".encode('utf-8'))
-        Motor2.write("g".encode('utf-8'))
+        Motor1.write("u".encode('utf-8'))
+        Motor2.write("u".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 0 0 0 1 1 1 1
-        Motor1.write("g".encode('utf-8'))
-        Motor2.write("g".encode('utf-8'))
+        Motor1.write("t".encode('utf-8'))
+        Motor2.write("t".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 1 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 0 0 1 1 1 1 1
-        Motor1.write("g".encode('utf-8'))
-        Motor2.write("g".encode('utf-8'))
+        Motor1.write("t".encode('utf-8'))
+        Motor2.write("t".encode('utf-8'))
         tengah = False
     # elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
     #         received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
@@ -332,12 +334,12 @@ def kondisiMundur():
             received_array[3] == 1 and received_array[4] == 1 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 1 1 1 1 1 1 1 1
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     else :
-        Motor1.write("h".encode('utf-8'))
-        Motor2.write("h".encode('utf-8'))
+        Motor1.write("y".encode('utf-8'))
+        Motor2.write("y".encode('utf-8'))
             
 def kondisiMajuKeTengah():
     global received_array, tengah    
@@ -358,8 +360,8 @@ def kondisiMajuKeTengah():
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and 
             received_array[9] == 1):
         #1 1 1 1 1 1 1 1 1 1
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
@@ -381,85 +383,86 @@ def kondisiMajuKeTengah():
             received_array[3] == 1 and received_array[4] == 1 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 1 1 1 0 0 0 0
-        Motor1.write("b".encode('utf-8'))
-        Motor2.write("b".encode('utf-8'))
+        Motor1.write("c".encode('utf-8'))
+        Motor2.write("c".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 1 0 0 0 0 0
-        Motor1.write("b".encode('utf-8'))
-        Motor2.write("b".encode('utf-8'))
+        Motor1.write("d".encode('utf-8'))
+        Motor2.write("d".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 1 0 0 1 1 1 1 1
-        Motor1.write("c".encode('utf-8'))
-        Motor2.write("c".encode('utf-8'))
+        Motor1.write("e".encode('utf-8'))
+        Motor2.write("e".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 0 0 0 1 1 1 1
-        Motor1.write("c".encode('utf-8'))
-        Motor2.write("c".encode('utf-8'))
+        Motor1.write("e".encode('utf-8'))
+        Motor2.write("e".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 1 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 0 0 1 1 1 1 1
-        Motor1.write("c".encode('utf-8'))
-        Motor2.write("c".encode('utf-8'))
+        Motor1.write("e".encode('utf-8'))
+        Motor2.write("e".encode('utf-8'))
         tengah = False
+
     elif (received_array[0] == 0 and received_array[1] == 0 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 0 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 0 and received_array[1] == 0 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 0 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 1 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 1 and received_array[1] == 0 and received_array[2] == 0 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 0 0 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 0 and received_array[1] == 0 and received_array[2] == 0 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #0 0 0 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     
     
@@ -467,36 +470,36 @@ def kondisiMajuKeTengah():
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 0 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 1 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 1 and received_array[1] == 0 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 0 0 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 0 and received_array[1] == 0 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #0 0 0 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
 
     else :
@@ -513,94 +516,94 @@ def kondisiMundurKeTengah():
         received_array[6] == 1 and received_array[7] == 1 and received_array[8] == 1 and 
         received_array[9] == 1):
         #1 1 1 0 0 0 1 1 1 1 
-        Motor1.write("e".encode('utf-8'))
-        Motor2.write("e".encode('utf-8'))
+        Motor1.write("z".encode('utf-8'))
+        Motor2.write("z".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 1 and received_array[8] == 1 and 
             received_array[9] == 1):
         #1 1 1 1 0 0 0 1 1 1
-        Motor1.write("f".encode('utf-8'))
-        Motor2.write("f".encode('utf-8'))
+        Motor1.write("x".encode('utf-8'))
+        Motor2.write("x".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 1 and received_array[8] == 1 and 
             received_array[9] == 1):
         #1 1 1 1 1 0 0 0 1 1
-        Motor1.write("f".encode('utf-8'))
-        Motor2.write("f".encode('utf-8'))
+        Motor1.write("w".encode('utf-8'))
+        Motor2.write("w".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 1 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 1 1 1 0 0 0 0
-        Motor1.write("f".encode('utf-8'))
-        Motor2.write("f".encode('utf-8'))
+        Motor1.write("v".encode('utf-8'))
+        Motor2.write("v".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 1 0 0 0 0 0
-        Motor1.write("f".encode('utf-8'))
-        Motor2.write("f".encode('utf-8'))
+        Motor1.write("v".encode('utf-8'))
+        Motor2.write("v".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 1 0 0 1 1 1 1 1
-        Motor1.write("g".encode('utf-8'))
-        Motor2.write("g".encode('utf-8'))
+        Motor1.write("u".encode('utf-8'))
+        Motor2.write("u".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 0 0 0 1 1 1 1
-        Motor1.write("g".encode('utf-8'))
-        Motor2.write("g".encode('utf-8'))
+        Motor1.write("t".encode('utf-8'))
+        Motor2.write("t".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 1 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1 and received_array[9] == 1):
         #1 1 0 0 1 1 1 1 1
-        Motor1.write("g".encode('utf-8'))
-        Motor2.write("g".encode('utf-8'))
+        Motor1.write("t".encode('utf-8'))
+        Motor2.write("t".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 0 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 1 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 1 and received_array[1] == 0 and received_array[2] == 0 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 0 0 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 0 and received_array[1] == 0 and received_array[2] == 0 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #0 0 0 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     
     
@@ -608,36 +611,36 @@ def kondisiMundurKeTengah():
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 0 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 1 1 1 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 1 and received_array[1] == 0 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #1 0 0 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     elif (received_array[0] == 0 and received_array[1] == 0 and received_array[2] == 0 and 
             received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
             received_array[6] == 0   and received_array[7] == 0 and received_array[8] == 0 and received_array[9] == 0):
         #0 0 0 0 0 0 0 0 0 0
-        Motor1.write("d".encode('utf-8'))
-        Motor2.write("d".encode('utf-8'))
+        Motor1.write("s".encode('utf-8'))
+        Motor2.write("s".encode('utf-8'))
         tengah = True
     
     else :
