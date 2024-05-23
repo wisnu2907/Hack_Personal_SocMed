@@ -136,60 +136,65 @@ void com_agv_motor(int dSL, int dSR) {
   agv_motor(pwmL, pwmR);
 }
 
-void maju1() {
+void majuKenceng() {
+  com_agv_motor(21, 21);
+}
+
+void majuKencengToMid() {
   com_agv_motor(16, 16);
 }
 
-void maju1a() {
-  com_agv_motor(11, 11);
+void majuPelan() {
+  com_agv_motor(20, 20);
 }
 
-void maju2() {
+void majuPelanToMid() {
+  com_agv_motor(13, 13);
+}
+
+void majuNgiri() {
   com_agv_motor(0, 0);
 }
 
-void maju3() {
+void majuNganan() {
   com_agv_motor(0, 0);
 }
 
-void mundur1() {
-  com_agv_motor(-16, -16);
+void mundurKenceng() {
+  com_agv_motor(-21, -21);
 }
 
-void mundur1a() {
+
+void mundurKencengToMid() {
+  com_agv_motor(-15, -15);
+}
+
+void mundurPelan() {
+  com_agv_motor(-20, -20);
+}
+
+void mundurPelanToMid() {
   com_agv_motor(-11, -11);
 }
 
-void mundur2() {
+void mundurNgiriToMid() {
   com_agv_motor(-5, 5);
 }
 
-void mundur2a() {
-  com_agv_motor(-6, 6);
-}
-
-void mundur2b() {
-  com_agv_motor(-7, 7);
-}
-
-void mundur3() {
+void mundurNgananToMid() {
   com_agv_motor(5, -5);
 }
 
-void mundur3a() {
-  com_agv_motor(6, -6);
+void mundurNgiri() {
+  com_agv_motor(-7, 7);
 }
 
-void F1() {
-  com_agv_motor(5, 5);
-}
-
-void Ba1() {
-  com_agv_motor(-5, -5);
+void mundurNganan() {
+  com_agv_motor(7, -7);
 }
 
 void SlideL() {
-  com_agv_motor(15, -15);
+  com_agv_motor(30, -30);
 }
 
 void Stop() {
@@ -276,56 +281,35 @@ void TaskMotor(void *pvParameters)  // This is a task.
   (void)pvParameters;
 
   for (;;) {
-    if (input == "a") maju1();
-    else if (input == "i") maju1a();
+    //Untuk Maju
+    if (input == "a") majuKenceng();
+    else if (input == "e") majuKencengToMid();
+    else if (input == "b") majuPelan();
+    else if (input == "e") majuPelanToMid();
+    else if (input == "c") majuNgiri();
+    else if (input == "d") majuNganan();
 
-    else if (input == "b") maju2();
-    else if (input == "c") maju2();
-    else if (input == "d") maju2();
+    //Untuk Mundur
+    else if (input == "1") mundurKenceng();
+    else if (input == "5") mundurKencengToMid();
+    else if (input == "2") mundurPelan();
+    else if (input == "6") mundurPelanToMid();
+    else if (input == "3") mundurNgiri();
+    else if (input == "7") mundurNgiriToMid();
+    else if (input == "4") mundurNganan();
+    else if (input == "8") mundurNgananToMid();
 
-    else if (input == "e") maju3();
+    //Untuk Stop
+    else if (input == "0") Stop();
 
-    else if (input == "s") Stop();
-
-    else if (input == "z") mundur1();
-    else if (input == "y") mundur1a();
-
-    else if (input == "x") mundur2();
-    else if (input == "w") mundur2a();
-    else if (input == "v") mundur2b();
-
-    else if (input == "u") mundur3();
-    else if (input == "t") mundur3a();
-
-    else if (input == "1") F1();
-    else if (input == "2") Ba1();
+    //Untuk Start
     else if (input == "L") {
       SlideL();
       if (CountL >= 95 || CountR >= 95) {
         Stop();
       }
     } else Stop();
-    // com_agv_motor(spdL, spdR);
-    // if (input == "1") F1();
-    // else if (input == "3") F2();
-    // else if (input == "4") F4();
-    // else if (input == "5") F5();
 
-    // else if (input == "A") Ba1();
-    // else if (input == "B") B2();
-    // else if (input == "C") B3();
-    // else if (input == "D") B4();
-    // else if (input == "E") B5();
-
-    // else if (input == "0") Stop();
-
-    // else if (input == "6") {
-    //   SlideL();
-    //   if (CountL >= 95 || CountR >= 95) {
-    //     Stop();
-    //   }
-    //   // one tick delay (15ms) in between reads for stability
-    // } else Stop();
     vTaskDelay(1);
   }
 }
