@@ -882,7 +882,7 @@ while True:
             # Arms = False
         elif center_x_cm <= 9  and center_x_cm >= -13 and not Sedot and not Arms  and not turun:
             stop() 
-            delay(0.6)
+            delay(0.85)
             detected.append(class_name)
             delay(0.1)
             Arm.write(command.encode("utf-8"))
@@ -890,7 +890,7 @@ while True:
             
     elif Arms and not Sedot and not turun and count_tot < 5:
         Arm.write(command.encode("utf-8"))
-        delay(0.5)
+        delay(0.8)
         Mega.write("2\n".encode("UTF-8"))
         delay(2)
         Mega.write("5\n".encode("UTF-8"))
@@ -907,6 +907,7 @@ while True:
         taruhSampah(detected)
         delay(0.6)
         Mega.write("4\n".encode("UTF-8"))
+        delay(0.3)
         detected.clear()
 
         count_tot += 1
@@ -928,14 +929,14 @@ while True:
             # Arms = False
         elif center_x_cm <= 13  and center_x_cm >= -9 and not Sedot and not Arms  and not turun:
             stop() 
-            delay(0.6)
+            delay(0.85)
             detected.append(class_name)
             delay(0.1)
             Arm.write(command.encode("utf-8"))
             Arms = True
     elif Arms and not Sedot and not turun and count_tot >= 5:
         Arm.write(command.encode("utf-8"))
-        delay(0.5)
+        delay(0.8)
         Mega.write("2\n".encode("UTF-8"))
         delay(2)
         Mega.write("5\n".encode("UTF-8"))
@@ -952,6 +953,7 @@ while True:
         taruhSampah(detected)
         delay(0.6)
         Mega.write("4\n".encode("UTF-8"))
+        delay(0.3)
         detected.clear()
         count_tot += 1
         Sedot = False
