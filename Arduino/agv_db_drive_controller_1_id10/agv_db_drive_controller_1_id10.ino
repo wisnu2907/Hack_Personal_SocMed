@@ -137,19 +137,19 @@ void com_agv_motor(int dSL, int dSR) {
 }
 
 void majuKenceng() {
-  com_agv_motor(21, 21);
+  com_agv_motor(22, 22);
 }
 
 void majuKencengToMid() {
-  com_agv_motor(16, 16);
+  com_agv_motor(15, 15);
 }
 
 void majuPelan() {
-  com_agv_motor(20, 20);
+  com_agv_motor(10, 10);
 }
 
 void majuPelanToMid() {
-  com_agv_motor(13, 13);
+  com_agv_motor(15, 15);
 }
 
 void majuNgiri() {
@@ -161,7 +161,7 @@ void majuNganan() {
 }
 
 void mundurKenceng() {
-  com_agv_motor(-21, -21);
+  com_agv_motor(-22, -22);
 }
 
 
@@ -170,11 +170,11 @@ void mundurKencengToMid() {
 }
 
 void mundurPelan() {
-  com_agv_motor(-20, -20);
+  com_agv_motor(-10, -10);
 }
 
 void mundurPelanToMid() {
-  com_agv_motor(-11, -11);
+  com_agv_motor(-15, -15);
 }
 
 void mundurNgiriToMid() {
@@ -186,11 +186,11 @@ void mundurNgananToMid() {
 }
 
 void mundurNgiri() {
-  com_agv_motor(-7, 7);
+  com_agv_motor(-5, 5);
 }
 
 void mundurNganan() {
-  com_agv_motor(7, -7);
+  com_agv_motor(5, -5);
 }
 
 void SlideL() {
@@ -285,7 +285,7 @@ void TaskMotor(void *pvParameters)  // This is a task.
     if (input == "a") majuKenceng();
     else if (input == "e") majuKencengToMid();
     else if (input == "b") majuPelan();
-    else if (input == "e") majuPelanToMid();
+    else if (input == "f") majuPelanToMid();
     else if (input == "c") majuNgiri();
     else if (input == "d") majuNganan();
 
