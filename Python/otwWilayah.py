@@ -59,25 +59,25 @@ if B.is_open:
     B.close()
 B.open()
 B.flush()
-print("B is opened")
+# print("B is opened")
 
 if F.is_open:
     F.close()
 F.open()
 F.flush
-print("F is opened")
+# print("F is opened")
 
 if Arm.is_open:
     Arm.close()
 Arm.open()
 Arm.flush()
-print("Arm is opened")
+# print("Arm is opened")
 
 if Mega.is_open:
     Mega.close()
 Mega.open()
 Mega.flush()
-print("Mega is opened")
+# print("Mega is opened")
 
 def delay(s):
     time.sleep(s)
@@ -141,7 +141,7 @@ def deteksi_objek():
 
             center_x_cm = ((x1 + x2) / 2 - frame.shape[1] / 2) * ratio_px_cm
             center_y_cm = (frame.shape[0] - ((y1 + y2) / 2)) * ratio_px_cm
-            command = f"{center_x_cm + 10:.5f} {center_y_cm+1:.5f}\n"
+            command = f"{center_x_cm + 22:.5f} {center_y_cm+1:.5f}\n"
 
             label_size, _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
             cv2.putText(
@@ -504,16 +504,16 @@ def kondisiMajuKeObjek():
     global received_array, tengah, tengah2, tengah1   
     if len(received_array) < 9:
         print("Error: received_array does not have 9 elements")
-        B.write("b".encode('utf-8'))
-        F.write("b".encode('utf-8'))
+        B.write("e".encode('utf-8'))
+        F.write("e".encode('utf-8'))
         return
     
     if (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
         received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
         received_array[6] == 1 and received_array[7] == 1 and received_array[8] == 1):
         #111000111 maju
-        B.write("b".encode('utf-8'))
-        F.write("b".encode('utf-8'))
+        B.write("e".encode('utf-8'))
+        F.write("e".encode('utf-8'))
         tengah = False
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
@@ -572,8 +572,8 @@ def kondisiMajuKeObjek():
         F.write("d".encode('utf-8'))
         tengah = False
     else :
-        B.write("b".encode('utf-8'))
-        F.write("b".encode('utf-8'))
+        B.write("e".encode('utf-8'))
+        F.write("e".encode('utf-8'))
 
 # Initialize last commands for the first run
 last_command_B = "b"
@@ -794,16 +794,16 @@ def kondisiMundurKeObjek():
     global received_array, tengah, tengah2, tes
     if len(received_array) < 9:
         print("Error: received_array does not have 9 elements")
-        B.write("2".encode('utf-8'))
-        F.write("2".encode('utf-8'))
+        B.write("5".encode('utf-8'))
+        F.write("5".encode('utf-8'))
         return
     
     if (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
         received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
         received_array[6] == 1 and received_array[7] == 1 and received_array[8] == 1):
         #111000111 maju
-        B.write("2".encode('utf-8'))
-        F.write("2".encode('utf-8'))
+        B.write("5".encode('utf-8'))
+        F.write("5".encode('utf-8'))
         tengah = False
 
     elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
@@ -864,23 +864,25 @@ def kondisiMundurKeObjek():
         F.write("8".encode('utf-8'))
         tengah = False
     else :
-        B.write("2".encode('utf-8'))
-        F.write("2".encode('utf-8'))
+        B.write("5".encode('utf-8'))
+        F.write("5".encode('utf-8'))
 
 delay(3)
 while True:
-    # kondisiMaju()
+    # kondisiMajuKeObjek()
+    # print("di luar cuy")
+    time.sleep(0.02)
     if not objek_terdeteksi and count_tot < 5 and not Sedot and not tengah and not Arms:
         Arm.write("0 20\n".encode("utf-8"))
         kondisiMaju()
     elif objek_terdeteksi and count_tot < 5  and not Sedot and not tengah and not Arms:
-        if center_x_cm > 4.5 and center_x_cm < 8 and not Arms:
+        if center_x_cm > 5 and center_x_cm < 10 and not Arms:
             Arm.write("0 20\n".encode("utf-8"))
             kondisiMajuKeObjek()
             # Arms = False
-        elif center_x_cm <= 4.5  and center_x_cm >= -8 and not Sedot and not Arms  and not turun:
+        elif center_x_cm <= 5  and center_x_cm >= -10 and not Sedot and not Arms  and not turun:
             stop() 
-            delay(0.5)
+            delay(0.7)
             detected.append(class_name)
             Arm.write(command.encode("utf-8"))
             Arms = True
@@ -901,7 +903,7 @@ while True:
         # taruhSampah(detected)
     elif Sedot and turun and not Arms and count_tot < 5 and tengah:
         taruhSampah(detected)
-        delay(0.6)
+        delay(0.7)
         Mega.write("4\n".encode("UTF-8"))
         detected.clear()
         delay(0.1)
@@ -918,11 +920,11 @@ while True:
         Arm.write("0 20\n".encode("utf-8"))
         kondisiMundur()
     elif objek_terdeteksi and count_tot >= 5  and not Sedot and not tengah and not Arms:
-        if center_x_cm > -8 and center_x_cm < -4.5 and not Arms:
+        if center_x_cm > -10 and center_x_cm < -5 and not Arms:
             Arm.write("0 20\n".encode("utf-8"))
             kondisiMundurKeObjek()
             # Arms = False
-        elif center_x_cm <= 8  and center_x_cm >= -4.5 and not Sedot and not Arms  and not turun:
+        elif center_x_cm <= 10  and center_x_cm >= -5 and not Sedot and not Arms  and not turun:
             stop() 
             delay(0.6)
             detected.append(class_name)
