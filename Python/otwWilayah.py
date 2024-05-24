@@ -499,6 +499,81 @@ def kondisiMajuKeTengah():
     else :
         B.write("e".encode('utf-8'))
         F.write("e".encode('utf-8'))
+        
+def kondisiMajuKeObjek():
+    global received_array, tengah, tengah2, tengah1   
+    if len(received_array) < 9:
+        print("Error: received_array does not have 9 elements")
+        B.write("b".encode('utf-8'))
+        F.write("b".encode('utf-8'))
+        return
+    
+    if (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
+        received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
+        received_array[6] == 1 and received_array[7] == 1 and received_array[8] == 1):
+        #111000111 maju
+        B.write("b".encode('utf-8'))
+        F.write("b".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
+            received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #111100111 nganan
+        B.write("c".encode('utf-8'))
+        F.write("c".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
+            received_array[3] == 1 and received_array[4] == 1 and received_array[5] == 0 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #111110111 nganan
+        B.write("c".encode('utf-8'))
+        F.write("c".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
+            received_array[3] == 1 and received_array[4] == 1 and received_array[5] == 0 and 
+            received_array[6] == 0   and received_array[7] == 1 and received_array[8] == 1):
+        #111110011 nganan
+        B.write("c".encode('utf-8'))
+        F.write("c".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
+            received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 1 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #111001111 ngiri
+        B.write("d".encode('utf-8'))
+        F.write("d".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
+            received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 1 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #110001111 ngiri
+        B.write("d".encode('utf-8'))
+        F.write("d".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
+            received_array[3] == 0 and received_array[4] == 1 and received_array[5] == 1 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #110011111 ngiri
+        B.write("d".encode('utf-8'))
+        F.write("d".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 1 and received_array[1] == 0 and received_array[2] == 0 and 
+            received_array[3] == 0 and received_array[4] == 1 and received_array[5] == 1 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #100011111 ngiri
+        B.write("d".encode('utf-8'))
+        F.write("d".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 0 and received_array[1] == 0 and received_array[2] == 0 and 
+            received_array[3] == 0 and received_array[4] == 1 and received_array[5] == 1 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #000011111 ngiri
+        B.write("d".encode('utf-8'))
+        F.write("d".encode('utf-8'))
+        tengah = False
+    else :
+        B.write("b".encode('utf-8'))
+        F.write("b".encode('utf-8'))
 
 # Initialize last commands for the first run
 last_command_B = "b"
@@ -714,6 +789,83 @@ def kondisiMundurKeTengah():
     else :
         B.write("5".encode('utf-8'))
         F.write("5".encode('utf-8'))
+        
+def kondisiMundurKeObjek():
+    global received_array, tengah, tengah2, tes
+    if len(received_array) < 9:
+        print("Error: received_array does not have 9 elements")
+        B.write("2".encode('utf-8'))
+        F.write("2".encode('utf-8'))
+        return
+    
+    if (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
+        received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 0 and 
+        received_array[6] == 1 and received_array[7] == 1 and received_array[8] == 1):
+        #111000111 maju
+        B.write("2".encode('utf-8'))
+        F.write("2".encode('utf-8'))
+        tengah = False
+
+    elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
+            received_array[3] == 1 and received_array[4] == 0 and received_array[5] == 0 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #111100111 ngiri
+        B.write("7".encode('utf-8'))
+        F.write("7".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
+            received_array[3] == 1 and received_array[4] == 1 and received_array[5] == 0 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #111110111 ngiri
+        B.write("7".encode('utf-8'))
+        F.write("7".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
+            received_array[3] == 1 and received_array[4] == 1 and received_array[5] == 0 and 
+            received_array[6] == 0   and received_array[7] == 1 and received_array[8] == 1):
+        #111110011 ngiri
+        B.write("7".encode('utf-8'))
+        F.write("7".encode('utf-8'))
+        tengah = False
+
+    elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
+            received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 1 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #111001111 nganan
+        B.write("8".encode('utf-8'))
+        F.write("8".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
+            received_array[3] == 0 and received_array[4] == 0 and received_array[5] == 1 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #110001111 nganan
+        B.write("8".encode('utf-8'))
+        F.write("8".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 0 and 
+            received_array[3] == 0 and received_array[4] == 1 and received_array[5] == 1 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #110011111 nganan
+        B.write("8".encode('utf-8'))
+        F.write("8".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 1 and received_array[1] == 0 and received_array[2] == 0 and 
+            received_array[3] == 0 and received_array[4] == 1 and received_array[5] == 1 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #100011111 nganan
+        B.write("8".encode('utf-8'))
+        F.write("8".encode('utf-8'))
+        tengah = False
+    elif (received_array[0] == 0 and received_array[1] == 0 and received_array[2] == 0 and 
+            received_array[3] == 0 and received_array[4] == 1 and received_array[5] == 1 and 
+            received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
+        #000011111 nganan
+        B.write("8".encode('utf-8'))
+        F.write("8".encode('utf-8'))
+        tengah = False
+    else :
+        B.write("2".encode('utf-8'))
+        F.write("2".encode('utf-8'))
 
 delay(3)
 while True:
@@ -722,24 +874,25 @@ while True:
         Arm.write("0 20\n".encode("utf-8"))
         kondisiMaju()
     elif objek_terdeteksi and count_tot < 5  and not Sedot and not tengah and not Arms:
-        if center_x_cm > 3 and center_x_cm < 7 and not Arms:
+        if center_x_cm > 4.5 and center_x_cm < 8 and not Arms:
             Arm.write("0 20\n".encode("utf-8"))
-            kondisiMaju()
+            kondisiMajuKeObjek()
             # Arms = False
-        elif center_x_cm <= 3  and center_x_cm >= -3 and not Sedot and not Arms  and not turun:
+        elif center_x_cm <= 4.5  and center_x_cm >= -8 and not Sedot and not Arms  and not turun:
             stop() 
             delay(0.5)
             detected.append(class_name)
             Arm.write(command.encode("utf-8"))
             Arms = True
+            
     elif Arms and not Sedot and not turun and count_tot < 5:
         Arm.write(command.encode("utf-8"))
         Mega.write("2\n".encode("UTF-8"))
         delay(2)
         Mega.write("5\n".encode("UTF-8"))
-        delay(2)
+        delay(1.7)
         taruhSampah(detected)
-        delay(0.3)               
+        delay(0.2)               
         turun = True
         Sedot = True
         Arms = False
@@ -765,11 +918,11 @@ while True:
         Arm.write("0 20\n".encode("utf-8"))
         kondisiMundur()
     elif objek_terdeteksi and count_tot >= 5  and not Sedot and not tengah and not Arms:
-        if center_x_cm > -7 and center_x_cm < -3 and not Arms:
+        if center_x_cm > -8 and center_x_cm < -4.5 and not Arms:
             Arm.write("0 20\n".encode("utf-8"))
-            kondisiMundur()
+            kondisiMundurKeObjek()
             # Arms = False
-        elif center_x_cm <= 3  and center_x_cm >= -3 and not Sedot and not Arms  and not turun:
+        elif center_x_cm <= 8  and center_x_cm >= -4.5 and not Sedot and not Arms  and not turun:
             stop() 
             delay(0.6)
             detected.append(class_name)
@@ -781,9 +934,9 @@ while True:
         Mega.write("2\n".encode("UTF-8"))
         delay(2)
         Mega.write("5\n".encode("UTF-8"))
-        delay(2)
+        delay(1.7)
         taruhSampah(detected)
-        delay(0.3)               
+        delay(0.2)               
         turun = True
         Sedot = True
         Arms = False
