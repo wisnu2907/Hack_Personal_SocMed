@@ -40,6 +40,23 @@ thread_sensor = threading.Thread(target=baca_sensor)
 thread_sensor.daemon = True
 thread_sensor.start()
 
+##KONDISI MAJU##
+#111000111 maju
+#111001111 ngiri
+#110001111 ngiri
+#110011111 ngiri
+#100011111 ngiri
+#111100111 nganan
+#111110111 nganan
+
+##KONDISI MUNDUR##
+#111000111 maju
+#111001111 nganan
+#110001111 nganan
+#110011111 nganan
+#100011111 nganan
+#111100111 ngiri
+#111110111 ngiri
 
 def kondisiMaju():
     global received_array, tengah    
