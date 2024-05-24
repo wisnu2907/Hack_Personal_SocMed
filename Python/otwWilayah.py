@@ -141,7 +141,7 @@ def deteksi_objek():
 
             center_x_cm = ((x1 + x2) / 2 - frame.shape[1] / 2) * ratio_px_cm
             center_y_cm = (frame.shape[0] - ((y1 + y2) / 2)) * ratio_px_cm
-            command = f"{center_x_cm + 22:.5f} {center_y_cm+1:.5f}\n"
+            command = f"{center_x_cm + 10:.5f} {center_y_cm+1:.5f}\n"
 
             label_size, _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
             cv2.putText(
@@ -726,25 +726,20 @@ while True:
             Arm.write("0 20\n".encode("utf-8"))
             kondisiMaju()
             # Arms = False
-        elif center_x_cm > -7 and center_x_cm < -3 and not Arms:
-            Arm.write("0 20\n".encode("utf-8"))
-            kondisiMundur()
-            # Arms = False
         elif center_x_cm <= 3  and center_x_cm >= -3 and not Sedot and not Arms  and not turun:
             stop() 
-            delay(0.6)
+            delay(0.5)
             detected.append(class_name)
             Arm.write(command.encode("utf-8"))
             Arms = True
     elif Arms and not Sedot and not turun and count_tot < 5:
-        delay(0.5)
         Arm.write(command.encode("utf-8"))
         Mega.write("2\n".encode("UTF-8"))
         delay(2)
         Mega.write("5\n".encode("UTF-8"))
         delay(2)
         taruhSampah(detected)
-        delay(0.4)               
+        delay(0.3)               
         turun = True
         Sedot = True
         Arms = False
@@ -753,10 +748,10 @@ while True:
         # taruhSampah(detected)
     elif Sedot and turun and not Arms and count_tot < 5 and tengah:
         taruhSampah(detected)
-        delay(0.5)
+        delay(0.6)
         Mega.write("4\n".encode("UTF-8"))
         detected.clear()
-        delay(0.3)
+        delay(0.1)
         count_tot += 1
         Sedot = False
         Arms = False
@@ -770,11 +765,7 @@ while True:
         Arm.write("0 20\n".encode("utf-8"))
         kondisiMundur()
     elif objek_terdeteksi and count_tot >= 5  and not Sedot and not tengah and not Arms:
-        if center_x_cm > 3 and center_x_cm < 7 and not Arms:
-            Arm.write("0 20\n".encode("utf-8"))
-            kondisiMaju()
-            # Arms = False
-        elif center_x_cm > -7 and center_x_cm < -3 and not Arms:
+        if center_x_cm > -7 and center_x_cm < -3 and not Arms:
             Arm.write("0 20\n".encode("utf-8"))
             kondisiMundur()
             # Arms = False
@@ -785,14 +776,14 @@ while True:
             Arm.write(command.encode("utf-8"))
             Arms = True
     elif Arms and not Sedot and not turun and count_tot >= 5:
-        delay(0.5)
+        delay(0.2)
         Arm.write(command.encode("utf-8"))
         Mega.write("2\n".encode("UTF-8"))
         delay(2)
         Mega.write("5\n".encode("UTF-8"))
         delay(2)
         taruhSampah(detected)
-        delay(0.4)               
+        delay(0.3)               
         turun = True
         Sedot = True
         Arms = False
@@ -801,10 +792,10 @@ while True:
         # taruhSampah(detected)
     elif Sedot and turun and not Arms and count_tot >= 5 and tengah:
         taruhSampah(detected)
-        delay(0.5)
+        delay(0.6)
         Mega.write("4\n".encode("UTF-8"))
         detected.clear()
-        delay(0.3)
+        delay(0.1)
         count_tot += 1
         Sedot = False
         Arms = False
