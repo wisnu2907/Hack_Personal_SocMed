@@ -10,7 +10,9 @@
 #define buzzer 13
 #define lmtA 25
 
-int arr_senPin[10] = { 38, 40, 42, 44, 46, 47, 45, 43, 41, 39 };
+// int arr_senPin[10] = { 38, 40, 42, 44, 46, 47, 45, 43, 41, 39 };
+int arr_senPin[9] = { 39, 41, 43, 45, 47, 46, 42, 40, 38 };
+
 
 void TaskComm(void *pvParameters);
 void TaskSensor(void *pvParameters);
@@ -34,7 +36,6 @@ void init_sensor() {
   pinMode(arr_senPin[6], INPUT);
   pinMode(arr_senPin[7], INPUT);
   pinMode(arr_senPin[8], INPUT);
-  pinMode(arr_senPin[9], INPUT);
 }
 
 void init_bt() {
@@ -96,16 +97,16 @@ void setup() {
 int arr_sens[10];
 
 void baca_sensor() {
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 9; i++) {
     arr_sens[i] = digitalRead(arr_senPin[i]);
     delay(5);
   }
 }
 
 void send_sensor_values() {
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 9; i++) {
     Serial.print(arr_sens[i]);
-    if (i < 9) {
+    if (i < 8) {
       Serial.print(",");
     }
   }
