@@ -137,31 +137,31 @@ void com_agv_motor(int dSL, int dSR) {
 }
 
 void majuKenceng() {
-  com_agv_motor(21, 21);
+  com_agv_motor(22, 22);
 }
 
 void majuKencengToMid() {
-  com_agv_motor(16, 16);
+  com_agv_motor(15, 15);
 }
 
-void majuPelan() {
-  com_agv_motor(20, 20);
+void [majuPelan() {
+  com_agv_motor(10, 10);
 }
 
 void majuPelanToMid() {
-  com_agv_motor(13, 13);
+  com_agv_motor(15, 15);
 }
 
 void majuNgiri() {
-  com_agv_motor(7, -7);
+  com_agv_motor(5, -5);
 }
 
 void majuNganan() {
-  com_agv_motor(-7, 7);
-}
+  com_agv_motor(-5, 5);
+} 
 
 void mundurKenceng() {
-  com_agv_motor(-21, -21);
+  com_agv_motor(-22, -22);
 }
 
 void mundurKencengToMid() {
@@ -169,19 +169,19 @@ void mundurKencengToMid() {
 }
 
 void mundurPelan() {
-  com_agv_motor(-20, -20);
+  com_agv_motor(-10, -10);
 }
 
 void mundurPelanToMid() {
-  com_agv_motor(-11, -11);
+  com_agv_motor(-15, -15);
 }
 
 void mundurNgiriToMid() {
-  com_agv_motor(-5, 5);
+  com_agv_motor(0, 0);
 }
 
 void mundurNgananToMid() {
-  com_agv_motor(5, -5);
+  com_agv_motor(0, 0);
 }
 
 void mundurNgiri() {
@@ -288,7 +288,7 @@ void TaskMotor(void *pvParameters)  // This is a task.
     else if (input == "c") majuNgiri();
     else if (input == "d") majuNganan();
 
-     //Untuk Mundur
+    //Untuk Mundur
     else if (input == "1") mundurKenceng();
     else if (input == "5") mundurKencengToMid();
     else if (input == "2") mundurPelan();
