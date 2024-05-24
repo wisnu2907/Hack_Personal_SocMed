@@ -288,13 +288,15 @@ void TaskMotor(void *pvParameters)  // This is a task.
     else if (input == "c") majuNgiri();
     else if (input == "d") majuNganan();
 
-    //Untuk Mundur
+     //Untuk Mundur
     else if (input == "1") mundurKenceng();
     else if (input == "5") mundurKencengToMid();
     else if (input == "2") mundurPelan();
     else if (input == "6") mundurPelanToMid();
     else if (input == "3") mundurNgiri();
+    else if (input == "7") mundurNgiriToMid();
     else if (input == "4") mundurNganan();
+    else if (input == "8") mundurNgananToMid();
 
     //Untuk Stop
     else if (input == "0") Stop();
