@@ -33,7 +33,6 @@ model.model.to(device)
 print("Using device:", device)
 
 cap = cv2.VideoCapture(0)
-# cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_AUTOFOCUS, 1)
 
 # Define the colors for the bounding boxes
@@ -916,7 +915,7 @@ while True:
     elif Sedot and turun and not Arms and count_tot % 2 == 0 and not tengah:
         kondisiMundurKeTengah()
         # taruhSampah(detected)
-    elif Sedot and turun and not Arms and count_tot % 2 == 05 and tengah:
+    elif Sedot and turun and not Arms and count_tot % 2 == 0 and tengah:
         taruhSampahMundur(detected)
         delay(0.75)
         Mega.write("4\n".encode("UTF-8"))
@@ -932,10 +931,11 @@ while True:
     # #########################################################################################
     # #######################################BUAT MUNDUR#######################################
     # #########################################################################################
+    
     elif not objek_terdeteksi and count_tot % 2 == 1 and not Sedot and not tengah and not Arms:
         Arm.write("0 20\n".encode("utf-8"))
         kondisiMundur()
-    elif objek_terdeteksi and count_tot % 2 == 1  and not Sedot and not tengah and not Arms:
+    elif objek_terdeteksi and count_tot % 2 == 1 and not Sedot and not tengah and not Arms:
         if  center_x_cm < -9 and not Arms:
             Arm.write("0 20\n".encode("utf-8"))
             kondisiMundurKeObjek()
