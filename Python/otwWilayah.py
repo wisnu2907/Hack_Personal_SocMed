@@ -885,10 +885,10 @@ while True:
     # kondisiMajuKeObjek()
     # print("di luar cuy")
     time.sleep(0.03)
-    if not objek_terdeteksi and count_tot < 5 and not Sedot and not tengah and not Arms:
+    if not objek_terdeteksi and count_tot % 2 == 0 and not Sedot and not tengah and not Arms:
         Arm.write("0 20\n".encode("utf-8"))
         kondisiMaju()
-    elif objek_terdeteksi and count_tot < 5  and not Sedot and not tengah and not Arms:
+    elif objek_terdeteksi and count_tot % 2 == 0  and not Sedot and not tengah and not Arms:
         if center_x_cm > 9 and not Arms:
             Arm.write("0 20\n".encode("utf-8"))
             kondisiMajuKeObjek()
@@ -901,7 +901,7 @@ while True:
             Arm.write(command.encode("utf-8"))
             Arms = True
             
-    elif Arms and not Sedot and not turun and count_tot < 5:
+    elif Arms and not Sedot and not turun and count_tot % 2 == 0:
         Arm.write(command.encode("utf-8"))
         delay(1.5)
         Mega.write("2\n".encode("UTF-8"))
@@ -913,10 +913,10 @@ while True:
         turun = True
         Sedot = True
         Arms = False
-    elif Sedot and turun and not Arms and count_tot < 5 and not tengah:
+    elif Sedot and turun and not Arms and count_tot % 2 == 0 and not tengah:
         kondisiMundurKeTengah()
         # taruhSampah(detected)
-    elif Sedot and turun and not Arms and count_tot < 5 and tengah:
+    elif Sedot and turun and not Arms and count_tot % 2 == 05 and tengah:
         taruhSampahMundur(detected)
         delay(0.75)
         Mega.write("4\n".encode("UTF-8"))
@@ -932,10 +932,10 @@ while True:
     # #########################################################################################
     # #######################################BUAT MUNDUR#######################################
     # #########################################################################################
-    elif not objek_terdeteksi and count_tot >= 5 and not Sedot and not tengah and not Arms:
+    elif not objek_terdeteksi and count_tot % 2 == 1 and not Sedot and not tengah and not Arms:
         Arm.write("0 20\n".encode("utf-8"))
         kondisiMundur()
-    elif objek_terdeteksi and count_tot >= 5  and not Sedot and not tengah and not Arms:
+    elif objek_terdeteksi and count_tot % 2 == 1  and not Sedot and not tengah and not Arms:
         if  center_x_cm < -9 and not Arms:
             Arm.write("0 20\n".encode("utf-8"))
             kondisiMundurKeObjek()
@@ -947,7 +947,7 @@ while True:
             delay(0.1)
             Arm.write(command.encode("utf-8"))
             Arms = True
-    elif Arms and not Sedot and not turun and count_tot >= 5:
+    elif Arms and not Sedot and not turun and count_tot % 2 == 1:
         Arm.write(command.encode("utf-8"))
         delay(1.5)
         Mega.write("2\n".encode("UTF-8"))
@@ -959,10 +959,10 @@ while True:
         turun = True
         Sedot = True
         Arms = False
-    elif Sedot and turun and not Arms and count_tot >= 5 and not tengah:
+    elif Sedot and turun and not Arms and count_tot % 2 == 1 and not tengah:
         kondisiMajuKeTengah()
         # taruhSampah(detected)
-    elif Sedot and turun and not Arms and count_tot >= 5 and tengah:
+    elif Sedot and turun and not Arms and count_tot % 2 == 1 and tengah:
         taruhSampahMaju(detected)
         delay(0.75)
         Mega.write("4\n".encode("UTF-8"))
