@@ -10,7 +10,9 @@
 #define buzzer 13
 #define lmtA 25
 
-int arr_senPin[10] = { 38, 40, 42, 44, 46, 47, 45, 43, 41, 39 };
+// int arr_senPin[10] = { 38, 40, 42, 44, 46, 47, 45, 43, 41, 39 };
+int arr_senPin[9] = { 39, 41, 43, 45, 47, 46, 42, 40, 38 };
+
 
 void TaskComm(void *pvParameters);
 void TaskSensor(void *pvParameters);
@@ -34,7 +36,6 @@ void init_sensor() {
   pinMode(arr_senPin[6], INPUT);
   pinMode(arr_senPin[7], INPUT);
   pinMode(arr_senPin[8], INPUT);
-  pinMode(arr_senPin[9], INPUT);
 }
 
 void init_bt() {
@@ -96,16 +97,16 @@ void setup() {
 int arr_sens[10];
 
 void baca_sensor() {
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 9; i++) {
     arr_sens[i] = digitalRead(arr_senPin[i]);
     delay(5);
   }
 }
 
 void send_sensor_values() {
-  for (int i = 0; i < 10; i++) {
+  for (int i = 0; i < 9; i++) {
     Serial.print(arr_sens[i]);
-    if (i < 9) {
+    if (i < 8) {
       Serial.print(",");
     }
   }
@@ -132,6 +133,10 @@ void TaskSensor(void *pvParameters)  // This is a task.
   for (;;) {
     baca_sensor();
     send_sensor_values();
+    // Naik();
+    // delay(2000);
+    // Turun();
+    // delay(2000);
     vTaskDelay(1);  // one tick delay (15ms) in between reads for stability
   }
 }
@@ -144,6 +149,11 @@ void Taskbt(void *pvParameters) {
     bool tombolDown = digitalRead(bt2);
     bool limitBottom = digitalRead(lmtB);
     bool limitTop = digitalRead(lmtA);
+
+    // Serial.print(tombolUp);
+    // Serial.print(tombolDown);
+    // Serial.print(limitBottom);
+    // Serial.println(limitTop);
 
     /* 
     tombolUp == LOW (dipencet)
@@ -174,8 +184,29 @@ void Taskbt(void *pvParameters) {
       stop();
     } else if (tombolUp == HIGH && tombolDown == HIGH && limitBottom == LOW && limitTop == HIGH) {
       stop();
+      if (input == "4") {
+        Lepas();
+      }
+      if (input == "5") {
+        Sedot();
+      }
     } else if (tombolUp == HIGH && tombolDown == HIGH && limitBottom == HIGH && limitTop == LOW) {
       stop();
+      if (input == "4") {
+        Lepas();
+      }
+      if (input == "5") {
+        Hisap();
+        stop();
+      }
+    } else if (tombolUp == HIGH && tombolDown == HIGH && limitBottom == HIGH && limitTop == HIGH) {
+      stop();
+      if (input == "4") {
+        Lepas();
+      }
+      if (input == "5") {
+        Sedot();
+      }
     } else if (tombolUp == LOW && tombolDown == LOW && limitBottom == HIGH && limitTop == LOW) {
       stop();
     } else if (tombolUp == LOW && tombolDown == HIGH && limitBottom == HIGH && limitTop == LOW) {
@@ -184,18 +215,18 @@ void Taskbt(void *pvParameters) {
       stop();
     } else if (tombolUp == LOW && tombolDown == LOW && limitBottom == LOW && limitTop == LOW) {
       stop();
-    } else if (input == "3" && tombolUp == HIGH && tombolDown == HIGH && limitBottom == LOW) {
-      Hisap();
-    } else if (input == "3" && tombolUp == HIGH && tombolDown == HIGH && limitBottom == HIGH) {
-      Hisap();
-    } else if (input == "4" && tombolUp == HIGH && tombolDown == HIGH && limitBottom == LOW) {
-      Lepas();
-    } else if (input == "4" && tombolUp == HIGH && tombolDown == HIGH && limitBottom == HIGH) {
-      Lepas();
-    } else if (input == "5" && tombolUp == HIGH && tombolDown == HIGH && limitBottom == LOW) {
-      Sedot();
-    } else if (input == "5" && tombolUp == HIGH && tombolDown == HIGH && limitBottom == HIGH) {
-      Sedot();
+      // } else if (input == "3" && tombolUp == HIGH && tombolDown == HIGH && limitBottom == LOW) {
+      //   Hisap();
+      // } else if (input == "3" && tombolUp == HIGH && tombolDown == HIGH && limitBottom == HIGH) {
+      //   Hisap();
+      // } else if (input == "4" && tombolUp == HIGH && tombolDown == HIGH && limitBottom == LOW) {
+      //   Lepas();
+      // } else if (input == "4" && tombolUp == HIGH && tombolDown == HIGH && limitBottom == HIGH) {
+      //   Lepas();
+      //   // } else if (input == "5" && tombolUp == HIGH && tombolDown == HIGH && limitBottom == LOW) {
+      //   //   Sedot();
+      // } else if (input == "5" && tombolUp == HIGH && tombolDown == HIGH && limitBottom == HIGH) {
+      //   Sedot();
     } else {
       stop();
       Lepas();
