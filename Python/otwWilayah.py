@@ -50,7 +50,7 @@ else:
     calibrated = False
 
 Mega = serial.Serial("COM5", 9600)
-Arm = serial.Serial("COM1", 1000000)
+Arm = serial.Serial("COM2", 1000000)
 B = serial.Serial("COM8", 9600)  # ID 10
 F = serial.Serial("COM7", 9600)  # ID 11
 
@@ -178,7 +178,20 @@ thread_sensor.daemon = True
 thread_sensor.start()
 
 
-def taruhSampah(detected):
+def taruhSampahMaju(detected):
+    if detected:
+        if detected[0] == "Ferro":
+            Arm.write("a".encode("utf-8"))
+        elif detected[0] == "Non-Ferro":
+            Arm.write("b".encode("utf-8"))
+        elif detected[0] in ["Plastik-Biru", "Plastik-Putih", "Botol"]:
+            Arm.write("c".encode("utf-8"))
+        elif detected[0] in ["Koran", "Kertas-Bungkus"]:
+            Arm.write("d".encode("utf-8"))
+        elif detected[0] in ["Daun-Basah", "Daun-Kering"]:
+            Arm.write("e".encode("utf-8"))
+            
+def taruhSampahMundur(detected):
     if detected:
         if detected[0] == "Ferro":
             Arm.write("1".encode("utf-8"))
@@ -871,7 +884,7 @@ delay(3)
 while True:
     # kondisiMajuKeObjek()
     # print("di luar cuy")
-    time.sleep(0.02)
+    time.sleep(0.03)
     if not objek_terdeteksi and count_tot < 5 and not Sedot and not tengah and not Arms:
         Arm.write("0 20\n".encode("utf-8"))
         kondisiMaju()
@@ -882,7 +895,7 @@ while True:
             # Arms = False
         elif center_x_cm <= 9  and center_x_cm >= -13 and not Sedot and not Arms  and not turun:
             stop() 
-            delay(0.85)
+            delay(1.3)
             detected.append(class_name)
             delay(0.1)
             Arm.write(command.encode("utf-8"))
@@ -890,12 +903,12 @@ while True:
             
     elif Arms and not Sedot and not turun and count_tot < 5:
         Arm.write(command.encode("utf-8"))
-        delay(0.8)
+        delay(1.5)
         Mega.write("2\n".encode("UTF-8"))
-        delay(2)
+        delay(1.8)
         Mega.write("5\n".encode("UTF-8"))
-        delay(1.6)
-        taruhSampah(detected)
+        delay(1.3)
+        taruhSampahMundur(detected)
         delay(0.1)               
         turun = True
         Sedot = True
@@ -904,10 +917,10 @@ while True:
         kondisiMundurKeTengah()
         # taruhSampah(detected)
     elif Sedot and turun and not Arms and count_tot < 5 and tengah:
-        taruhSampah(detected)
-        delay(0.6)
+        taruhSampahMundur(detected)
+        delay(0.75)
         Mega.write("4\n".encode("UTF-8"))
-        delay(0.3)
+        delay(0.27)
         detected.clear()
 
         count_tot += 1
@@ -929,19 +942,19 @@ while True:
             # Arms = False
         elif center_x_cm <= 13  and center_x_cm >= -9 and not Sedot and not Arms  and not turun:
             stop() 
-            delay(0.85)
+            delay(1.3)
             detected.append(class_name)
             delay(0.1)
             Arm.write(command.encode("utf-8"))
             Arms = True
     elif Arms and not Sedot and not turun and count_tot >= 5:
         Arm.write(command.encode("utf-8"))
-        delay(0.8)
+        delay(1.5)
         Mega.write("2\n".encode("UTF-8"))
-        delay(2)
+        delay(1.8)
         Mega.write("5\n".encode("UTF-8"))
-        delay(1.6)
-        taruhSampah(detected)
+        delay(1.3)
+        taruhSampahMaju(detected)
         delay(0.1)               
         turun = True
         Sedot = True
@@ -950,10 +963,10 @@ while True:
         kondisiMajuKeTengah()
         # taruhSampah(detected)
     elif Sedot and turun and not Arms and count_tot >= 5 and tengah:
-        taruhSampah(detected)
-        delay(0.6)
+        taruhSampahMaju(detected)
+        delay(0.75)
         Mega.write("4\n".encode("UTF-8"))
-        delay(0.3)
+        delay(0.27)
         detected.clear()
         count_tot += 1
         Sedot = False
