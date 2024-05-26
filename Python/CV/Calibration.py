@@ -2,7 +2,8 @@ import cv2
 import numpy as np
 
 # Set the resolution of the webcam
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cap.set(cv2.CAP_PROP_AUTOFOCUS, 1)
 
 # File name for saving calibration settings
 settings_file = "calibration_settings.npz"

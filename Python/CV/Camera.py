@@ -5,8 +5,10 @@ import numpy as np
 import torch
 from ultralytics import YOLO
 
+logitune=True
+
 # Initialize the YOLO model
-model = YOLO("Python\\CV\\best.pt")
+model = YOLO(r"C:\Users\wisnu\Coding\KRTMI2024\Python\best.pt")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.model.to(device)
 
@@ -14,16 +16,13 @@ model.model.to(device)
 print("Using device:", device)
 print()
 
-# Additional Info when using cuda
-if device.type == "cuda":
-    print(torch.cuda.get_device_name(0))
-    print("Memory Usage:")
-    print("Allocated:", round(torch.cuda.memory_allocated(0) / 1024**3, 1), "GB")
-    print("Cached:   ", round(torch.cuda.memory_reserved(0) / 1024**3, 1), "GB")
+cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # Set resolution to 640x480 for faster processing
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+cap.set(cv2.CAP_PROP_AUTOFOCUS, 1)
 
-cap = cv2.VideoCapture(0)  
 # Define the colors for the bounding boxes
-COLORS = [(0, 255, 0), (255, 0, 0), (0, 0, 255), (255, 255, 0), (0, 255, 255)]
+COLORS = (255, 255, 255)
 
 # Load calibration settings if the file exists
 calibration_file = "calibration_settings.npz"
@@ -39,6 +38,10 @@ else:
 while True:
     # Read a frame from the webcam
     ret, frame = cap.read()
+    
+    if logitune:
+        os.startfile(r"C:\ProgramData\Microsoft\Windows\Start Menu\Programs\Logitech\LogiTune.lnk")
+        logitune=False
 
     # Calibration
     if calibrated:
@@ -52,56 +55,37 @@ while True:
         matrix = cv2.getPerspectiveTransform(pts1, pts2)
         frame = cv2.warpPerspective(frame, matrix, (width, height))
 
-
     # Perform object detection on the frame
-    results = model.predict(source=frame, show=False, conf=0.5)
+    results = model.predict(source=frame, show=False, conf=0.8)
     results[0].boxes = results[0].boxes.to(device)
-
-    # ratio pixel to cm
-    ratio_px_cm = 194 / 100
 
     # Draw the detection results on the frame
     for box in results[0].boxes:
         x1, y1, x2, y2 = box.xyxy[0]
         conf = box.conf[0]
         cls = box.cls[0]
-        label = f"{model.names[int(cls)]}: {conf:.2f}"
-        color = COLORS[int(cls) % len(COLORS)]
+        label = f"{model.names[int(cls)]}: {conf:.3f}"
 
         # Draw bounding box
-        cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), color, 2)
+        cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), COLORS, 2)
+        
+        # Ratio pixel to cm
+        ratio_px_cm = 45 / frame.shape[0]
 
         # Calculate and display the center coordinates in centimeters
-        center_x_cm = (
-            (int((x1 + x2) / 2) - frame.shape[1] // 2) / ratio_px_cm / 10
-        )  # divide by 10 to convert mm to cm
+        center_x_cm = ((x1 + x2) / 2 - frame.shape[1] / 2) * ratio_px_cm
+        center_y_cm = (frame.shape[0] - ((y1 + y2) / 2)) * ratio_px_cm
 
-        center_y_cm = (y1 / ratio_px_cm / 10)  # divide by 10 to convert mm to cm
-        # divide by 10 to convert mm to cm
-        
-        center_x = int((x1 + x2) / 2) - frame.shape[1] // 2
-        center_y = frame.shape[0] // 2 - int((y1 + y2) / 2)
-        cv2.circle(frame, (int(center_x_cm), int(center_y_cm)), 5, (0, 255, 255), -1)
-        # cv2.circle(frame, (center_x, center_y), 5, (0, 255, 255), -1)
 
         # Draw labelq
         label_size, _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
         cv2.putText(
             frame,
             label,
-            (int(x1), int(y2) + label_size[1]),
+            (10, 30),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
-            (255, 255, 255),
-            2,
-        )
-        cv2.putText(
-            frame,
-            label,
-            (int(x1), int(y1) - 40),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.5,
-            (0, 0, 0),
+            COLORS,
             2,
         )
 
@@ -109,22 +93,13 @@ while True:
         cv2.putText(
             frame,
             f"Center (cm): ({center_x_cm:.3f} cm, {center_y_cm:.3f} cm)",
-            (int(x1), int(y2) + label_size[1] + 20),
+            (10, 50),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
-            (0, 0, 0),
+            COLORS,
             2,
         )
-        cv2.putText(
-            frame,
-            f"Center (cm): ({center_x_cm:.3f} cm, {center_y_cm:.3f} cm)",
-            (int(x1), int(y1) - 10),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.5,
-            (0, 0, 0),
-            2,
-        )
-        
+
     # Display the frame
     cv2.imshow("Astro_24", frame)
 
