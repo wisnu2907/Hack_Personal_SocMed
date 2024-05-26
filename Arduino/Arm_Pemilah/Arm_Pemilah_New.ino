@@ -2,8 +2,8 @@
 #include <math.h>  // Include the math library for mathematical functions
 
 // Define constants for servo IDs, control pin, baud rate, and angle limits
-#define ID1 9u   //mx1A
-#define ID2 10u  //mx1B
+#define ID1 10u   //mx1A
+#define ID2 9u  //mx1B
 // #define relay 5
 
 #define SERVO_ControlPin 7
@@ -16,15 +16,12 @@
 unsigned int tegak_mx = CCW_LIMIT_ANGLE_MX / 2;
 
 // Define the lengths of the links
-float L1 = 31.4;  // cm
-float L2 = 31.3;  // cm
+float L1 = 37.49;  // cm
+float L2 = 38.5;  // cm
 
 // Function to drive the servos based on x and y coordinates
-void driveServo(float x, float y) {
+void driveServo(float x, float y, int spd1, int spd2) {
   // Calculate the angles for the servo positions using inverse kinematics
-  // float theta2 = acos((pow(x + 24, 2) + pow(y + 14, 2) - pow(L1, 2) - pow(L2, 2)) / (2 * L1 * L2));
-  // float theta1 = atan2(x + 24, y + 14) - atan2((L2 * sin(theta2)), (L1 + L2 * cos(theta2)));
-
 
   float theta2 = acos((pow(x, 2) + pow(y, 2) - pow(L1, 2) - pow(L2, 2)) / (2 * L1 * L2));
   float theta1 = atan2(x, y) - atan2((L2 * sin(theta2)), (L1 + L2 * cos(theta2)));
@@ -36,24 +33,24 @@ void driveServo(float x, float y) {
   // Also, set the speed for servo movement
   if (pos1 < 0 && pos2 > 0) {
     pos1 = (-1) * pos1;
-    joint1(tegak_mx - Deg(pos1), 0x3FF / 5);
-    joint2(tegak_mx + Deg(pos2), 0x3FF / 5);
+    joint1(tegak_mx - Deg(pos1), spd1);
+    joint2(tegak_mx + Deg(pos2), spd2);
     delay(5);
   } else if (pos1 > 0 && pos2 < 0) {
     pos2 = (-1) * pos2;
-    joint1(tegak_mx + Deg(pos1), 0x3FF / 5);
-    joint2(tegak_mx - Deg(pos2), 0x3FF / 5);
+    joint1(tegak_mx + Deg(pos1), spd1);
+    joint2(tegak_mx - Deg(pos2), spd2);
 
     delay(5);
   } else if (pos1 < 0 && pos2 < 0) {
     pos1 = (-1) * pos1;
     pos2 = (-1) * pos2;
-    joint1(tegak_mx + Deg(pos1), 0x3FF / 5);
-    joint2(tegak_mx + Deg(pos2), 0x3FF / 5);
+    joint1(tegak_mx + Deg(pos1), spd1);
+    joint2(tegak_mx + Deg(pos2), spd2);
     delay(5);
   } else if (pos1 > 0 && pos2 > 0) {
-    joint1(tegak_mx + Deg(pos1), 0x3FF / 5);
-    joint2(tegak_mx + Deg(pos2), 0x3FF / 5);
+    joint1(tegak_mx + Deg(pos1), spd1);
+    joint2(tegak_mx + Deg(pos2), spd2);
     delay(5);
   }
 }
@@ -82,24 +79,43 @@ void joint2(unsigned int pos2, int speed) {
   delay(1);
 }
 
-void sampah1() {
-  driveServo(36.5, 50.75);
+void sampah1a() {
+  driveServo(40, 64, 0x3FF/8, 0x3FF/5);
 }
 
-void sampah2() {
-  driveServo(20.5, 57);
+void sampah2a() {
+  driveServo(19.5, 64, 0x3FF/8, 0x3FF/5);
 }
 
-void sampah3() {
-  driveServo(0, 57);
+void sampah3a() {
+  driveServo(0, 66, 0x3FF/8, 0x3FF/5);
 }
 
-void sampah4() {
-  driveServo(-20.5, 57);
+void sampah4a() {
+  driveServo(-21.5, 63, 0x3FF/8, 0x3FF/5);
 }
 
-void sampah5() {
-  driveServo(-36.5, 50.75);
+void sampah5a() {
+ driveServo(-40, 62, 0x3FF/8, 0x3FF/5);
+}
+void sampah1b() {
+  driveServo(40-6.5, 64, 0x3FF/8, 0x3FF/5);
+}
+
+void sampah2b() {
+  driveServo(19.5-6.5, 64, 0x3FF/8, 0x3FF/5);
+}
+
+void sampah3b() {
+  driveServo(0-6.5, 66, 0x3FF/8, 0x3FF/5);
+}
+
+void sampah4b() {
+  driveServo(-21.5-6.5, 63, 0x3FF/8, 0x3FF/5);
+}
+
+void sampah5b() {
+ driveServo(-40-3.5, 62, 0x3FF/8, 0x3FF/5);
 }
 
 // Setup function to initialize Serial communication and Dynamixel servos
@@ -115,12 +131,11 @@ void setup() {
   digitalWrite(13, HIGH);
   delay(500);
   digitalWrite(13, LOW);
-  delay(1000);
+  delay(500);
   digitalWrite(13, HIGH);
   delay(500);
   digitalWrite(13, LOW);
-  joint1(tegak_mx - Deg(85), 200);
-  joint2(tegak_mx + Deg(170), 150);
+  driveServo(0, 20, 0x3FF/8, 0x3FF/5);
 }
 
 /*
@@ -139,22 +154,28 @@ void loop() {
     if (spaceIndex != -1) {
       float x = input.substring(0, spaceIndex).toFloat();
       float y = input.substring(spaceIndex + 1).toFloat();
-      driveServo(x, y);
-      delay(250);
+      driveServo(x, y, 0x3FF/4, 0x3FF);
+      delay(200);
     } else if (input == "1") {
-      sampah1();
-      delay(250);
+      sampah1a();
     } else if (input == "2") {
-      sampah2();
-      delay(250);
+      sampah2a();
     } else if (input == "3") {
-      sampah3();
-      delay(250);
+      sampah3a();
     } else if (input == "4") {
-      sampah4();
-      delay(250);
+      sampah4a();
     } else if (input == "5") {
-      sampah5();
+      sampah5a();
+    } else if (input == "a") {
+      sampah1b();
+    } else if (input == "b") {
+      sampah2b();
+    } else if (input == "c") {
+      sampah3b();
+    } else if (input == "d") {
+      sampah4b();
+    } else if (input == "e") {
+      sampah5b();
     }
   }
 }
