@@ -21,7 +21,8 @@ kiri_habis = False
 center_x_cm = 0
 center_y_cm = 0
 count_tot = 0
-counter = 0
+counter =0
+counter2 =0
 
 detected = []
 received_array = []
@@ -29,13 +30,13 @@ class_name = ""
 command = ""
 
 # Initialize the YOLO model
-model = YOLO(r"C:\Users\wisnu\Coding\KRTMI2024\Python\best.pt")
+model = YOLO(r"C:\Ndaru\KRTMI\programming\best.pt")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.model.to(device)
 
 print("Using device:", device)
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 cap.set(cv2.CAP_PROP_AUTOFOCUS, 1)
 
 # Define the colors for the bounding boxes
@@ -51,10 +52,10 @@ if os.path.exists(calibration_file):
 else:
     calibrated = False
 
-Mega = serial.Serial("COM2", 9600)
-Arm = serial.Serial("COM1", 1000000)
-B = serial.Serial("COM8", 9600)  # ID 10
-F = serial.Serial("COM7", 9600)  # ID 11
+Mega = serial.Serial("COM12", 9600)
+Arm = serial.Serial("COM11", 1000000)
+B = serial.Serial("COM5", 9600)  # ID 10
+F = serial.Serial("COM6", 9600)  # ID 11
 
 
 if B.is_open:
@@ -88,12 +89,31 @@ def stop():
     B.write("0".encode("utf-8"))
     F.write("0".encode("utf-8"))
 
+def slideL():
+    B.write("L\n".encode("utf-8"))
+    F.write("L\n".encode("utf-8"))
 
-    B.write("L".encode("utf-8"))
-    F.write("L".encode("utf-8"))
+
+
+def baca_encoder():
+    global counter
+    while True:
+        counter = B.readline().decode().rstrip()
+        print(counter)
+
+
+thread_enc = threading.Thread(target=baca_encoder)
+thread_enc.daemon = True
+thread_enc.start()
+delay(2)
+
+print("menunggu nyala")
+
+B.write("L\n".encode("utf-8"))
+F.write("L\n".encode("utf-8"))
 while True:
-    counter = B.readline().decode().rstrip()
-    if counter >= 95:
+    # delay(0.02)
+    if float(counter) >=95 :
         stop()
         break
 
@@ -788,7 +808,7 @@ def kondisiMundurKeObjek():
         B.write("5".encode('utf-8'))
         F.write("5".encode('utf-8'))
 
-delay(2.7)
+delay(10)
 while True:
     # kondisiMajuKeObjek()
     # print("di luar cuy")
