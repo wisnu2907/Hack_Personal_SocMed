@@ -39,9 +39,9 @@ void read_encoder() {
   if (newPositionL != oldPositionL || newPositionR != oldPositionR) {
     oldPositionL = newPositionL;
     oldPositionR = newPositionR;
-    Serial.print(newPositionL);
-    Serial.print('\t');
-    Serial.println(newPositionR);  // Serial.print('\t');
+    // Serial.print(newPositionL);
+    // Serial.print('\t');
+    // Serial.println(newPositionR);  // Serial.print('\t');
   }
 }
 
@@ -304,9 +304,6 @@ void TaskMotor(void *pvParameters)  // This is a task.
     //Untuk Start
     else if (input == "L") {
       SlideL();
-      if (CountL >= 95 || CountR >= 95) {
-        Stop();
-      }
     } else Stop();
 
     vTaskDelay(1);
