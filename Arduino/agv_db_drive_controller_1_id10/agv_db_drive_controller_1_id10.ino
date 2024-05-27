@@ -39,9 +39,9 @@ void read_encoder() {
   if (newPositionL != oldPositionL || newPositionR != oldPositionR) {
     oldPositionL = newPositionL;
     oldPositionR = newPositionR;
-    Serial.print(newPositionL);
-    Serial.print('\t');
-    Serial.println(newPositionR);  // Serial.print('\t');
+    // Serial.print(newPositionL);
+    // Serial.print('\t');
+    // Serial.println(newPositionR);  // Serial.print('\t');
   }
 }
 
@@ -105,7 +105,7 @@ void com_agv_motor(int dSL, int dSR) {
 
   // Serial.print(CountL);
   // Serial.print("\t");
-  // Serial.println(CountR);
+  Serial.println(CountR);
 
   myEncL.write(0);
   myEncR.write(0);
@@ -305,9 +305,6 @@ void TaskMotor(void *pvParameters)  // This is a task.
     //Untuk Start
     else if (input == "L") {
       SlideL();
-      if (CountL >= 95 || CountR >= 95) {
-        Stop();
-      }
     } else Stop();
 
     vTaskDelay(1);
