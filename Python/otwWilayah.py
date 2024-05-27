@@ -141,7 +141,7 @@ def deteksi_objek():
 
             center_x_cm = ((x1 + x2) / 2 - frame.shape[1] / 2) * ratio_px_cm
             center_y_cm = (frame.shape[0] - ((y1 + y2) / 2)) * ratio_px_cm
-            command = f"{center_x_cm + 6:.5f} {center_y_cm+2:.5f}\n"
+            command = f"{center_x_cm + 6.5:.5f} {center_y_cm - 0.3:.5f}\n"
 
             label_size, _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
             cv2.putText(
@@ -785,7 +785,7 @@ def kondisiMundurKeObjek():
         B.write("5".encode('utf-8'))
         F.write("5".encode('utf-8'))
 
-delay(3)
+delay(2.7)
 while True:
     # kondisiMajuKeObjek()
     # print("di luar cuy")
