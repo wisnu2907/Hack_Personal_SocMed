@@ -137,19 +137,19 @@ void com_agv_motor(int dSL, int dSR) {
 }
 
 void majuKenceng() {
-  com_agv_motor(22, 22);
+  com_agv_motor(25, 25);
 }
 
 void majuKencengToMid() {
-  com_agv_motor(15, 15);
+  com_agv_motor(20, 20);
 }
 
 void majuPelan() {
-  com_agv_motor(10, 10);
+  com_agv_motor(9, 9);
 }
 
 void majuPelanToMid() {
-  com_agv_motor(15, 15);
+  com_agv_motor(20, 20);
 }
 
 void majuNgiri() {
@@ -161,20 +161,20 @@ void majuNganan() {
 }
 
 void mundurKenceng() {
-  com_agv_motor(-22, -22);
+  com_agv_motor(-25, -25);
 }
 
 
 void mundurKencengToMid() {
-  com_agv_motor(-15, -15);
+  com_agv_motor(-20, -20);
 }
 
 void mundurPelan() {
-  com_agv_motor(-10, -10);
+  com_agv_motor(-9, -9);
 }
 
 void mundurPelanToMid() {
-  com_agv_motor(-15, -15);
+  com_agv_motor(-20, -20);
 }
 
 void mundurNgiriToMid() {
@@ -182,7 +182,7 @@ void mundurNgiriToMid() {
 }
 
 void mundurNgananToMid() {
-  com_agv_motor(5, -5);
+  com_agv_motor(4, -4);
 }
 
 void mundurNgiri() {
@@ -190,7 +190,7 @@ void mundurNgiri() {
 }
 
 void mundurNganan() {
-  com_agv_motor(5, -5);
+  com_agv_motor(4, -4);
 }
 
 void SlideL() {
