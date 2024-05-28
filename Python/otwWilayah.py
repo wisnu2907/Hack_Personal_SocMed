@@ -50,7 +50,7 @@ if os.path.exists(calibration_file):
 else:
     calibrated = False
 
-Mega = serial.Serial("COM2", 9600)
+Mega = serial.Serial("COM5", 9600, timeout= 1)
 Arm = serial.Serial("COM1", 1000000)
 B = serial.Serial("COM8", 9600)  # ID 10
 F = serial.Serial("COM7", 9600)  # ID 11
@@ -87,22 +87,13 @@ def stop():
     B.write("0".encode("utf-8"))
     F.write("0".encode("utf-8"))
 
-
-delay(2)
-B.write("L".encode("utf-8"))
-F.write("L".encode("utf-8"))
-delay(2.77)
-stop()
-
-
 def baca_sensor():
     global data, received_array
     while True:
         data = Mega.readline().decode().rstrip()
         received_array = list(map(int, data.split(",")))
         # print("Received array:", received_array)
-
-
+        
 def deteksi_objek():
     global  objek_terdeteksi, logitune, ret, frame, cap, class_name, detected, center_x_cm, center_y_cm, command
     while True:
@@ -133,6 +124,7 @@ def deteksi_objek():
             conf = box.conf[0]
             cls = box.cls[0]
             class_name = model.names[int(cls)]
+            # label = f"{class_name}: {conf:.3f}"
             label = f"{class_name}: {conf:.3f}"
 
             cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), COLORS, 2)
@@ -141,7 +133,7 @@ def deteksi_objek():
 
             center_x_cm = ((x1 + x2) / 2 - frame.shape[1] / 2) * ratio_px_cm
             center_y_cm = (frame.shape[0] - ((y1 + y2) / 2)) * ratio_px_cm
-            command = f"{center_x_cm + 6.5:.5f} {center_y_cm - 0.3:.5f}\n"
+            command = f"{center_x_cm + 5.5:.5f} {center_y_cm + 2:.5f}\n"
 
             label_size, _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
             cv2.putText(
@@ -167,17 +159,7 @@ def deteksi_objek():
         cv2.imshow("Astro_24", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
-
-
-thread_kamera = threading.Thread(target=deteksi_objek)
-thread_kamera.daemon = True
-thread_kamera.start()
-
-thread_sensor = threading.Thread(target=baca_sensor)
-thread_sensor.daemon = True
-thread_sensor.start()
-
-
+        
 def taruhSampahMaju(detected):
     if detected:
         if detected[0] == "Ferro":
@@ -186,10 +168,34 @@ def taruhSampahMaju(detected):
             Arm.write("b".encode("utf-8"))
         elif detected[0] in ["Plastik-Biru", "Plastik-Putih", "Botol"]:
             Arm.write("c".encode("utf-8"))
-        elif detected[0] in ["Koran", "Kertas-Bungkus"]:
-            Arm.write("d".encode("utf-8"))
         elif detected[0] in ["Daun-Basah", "Daun-Kering"]:
             Arm.write("e".encode("utf-8"))
+        elif detected[0] in ["Koran", "Kertas-Bungkus"]:
+            Arm.write("d".encode("utf-8"))
+
+def taruhSampahMajungide(detected):
+    if not detected:
+        return
+
+    category = detected[0]
+
+    def switch_case(category):
+        return {
+            "Ferro": "a",
+            "Non-Ferro": "b",
+            "Plastik-Biru": "c",
+            "Plastik-Putih": "c",
+            "Botol": "c",
+            "Daun-Basah": "e",
+            "Daun-Kering": "e",
+            "Koran": "d",
+            "Kertas-Bungkus": "d"
+        }.get(category)
+
+    command = switch_case(category)
+    if command:
+        Arm.write(command.encode("utf-8"))
+
             
 def taruhSampahMundur(detected):
     if detected:
@@ -203,6 +209,29 @@ def taruhSampahMundur(detected):
             Arm.write("4".encode("utf-8"))
         elif detected[0] in ["Daun-Basah", "Daun-Kering"]:
             Arm.write("5".encode("utf-8"))
+
+def taruhSampahMundurngide(detected):
+    if not detected:
+        return
+
+    category = detected[0]
+
+    def switch_case(category):
+        return {
+            "Ferro": "1",
+            "Non-Ferro": "2",
+            "Plastik-Biru": "3",
+            "Plastik-Putih": "3",
+            "Botol": "3",
+            "Koran": "4",
+            "Kertas-Bungkus": "4",
+            "Daun-Basah": "5",
+            "Daun-Kering": "5"
+        }.get(category)
+
+    command = switch_case(category)
+    if command:
+        Arm.write(command.encode("utf-8"))
 
 
 def kondisiMaju():
@@ -495,7 +524,6 @@ def kondisiMajuKeObjek():
         B.write("e".encode('utf-8'))
         F.write("e".encode('utf-8'))
 
-
 def kondisiMundur():
     global received_array, tengah, kiri_habis
     if len(received_array) < 9:
@@ -785,11 +813,29 @@ def kondisiMundurKeObjek():
         B.write("5".encode('utf-8'))
         F.write("5".encode('utf-8'))
 
-delay(2.7)
+
+thread_kamera = threading.Thread(target=deteksi_objek)
+thread_kamera.daemon = True
+thread_kamera.start()       
+
+while True:
+    start = input("start ga bos?: ")
+    if start == "":
+        F.write("L".encode("UTF-8"))
+        B.write("L".encode("UTF-8"))
+        delay(2.27)
+        stop()
+        break
+
+thread_sensor = threading.Thread(target=baca_sensor)
+thread_sensor.daemon = True
+thread_sensor.start()
+
+delay(1.9)
 while True:
     # kondisiMajuKeObjek()
     # print("di luar cuy")
-    time.sleep(0.03)
+    time.sleep(0.021)
     if not objek_terdeteksi and count_tot % 2 == 0 and not Sedot and not tengah and not Arms:
 
         Arm.write("0 20\n".encode("utf-8")) 
@@ -810,19 +856,19 @@ while True:
             stop() 
             delay(1.3)
             detected.append(class_name)
-            delay(0.1)
+            delay(0.01)
             Arm.write(command.encode("utf-8"))
             Arms = True
             
     elif Arms and not Sedot and not turun and count_tot % 2 == 0:
         Arm.write(command.encode("utf-8"))
-        delay(1.5)
+        delay(1.45)
         Mega.write("2\n".encode("UTF-8"))
-        delay(1.8)
+        delay(1.85)
         Mega.write("5\n".encode("UTF-8"))
-        delay(1.3)
+        delay(1.4)
         taruhSampahMundur(detected)
-        delay(0.1)               
+        # delay(0.01)               
         turun = True
         Sedot = True
         Arms = False
@@ -831,9 +877,9 @@ while True:
         # taruhSampah(detected)
     elif Sedot and turun and not Arms and count_tot % 2 == 0 and tengah:
         taruhSampahMundur(detected)
-        delay(0.75)
+        delay(0.7)
         Mega.write("4\n".encode("UTF-8"))
-        delay(0.27)
+        delay(0.3)
         detected.clear()
 
         count_tot += 1
@@ -866,18 +912,18 @@ while True:
             stop() 
             delay(1.3)
             detected.append(class_name)
-            delay(0.1)
+            delay(0.01)
             Arm.write(command.encode("utf-8"))
             Arms = True
     elif Arms and not Sedot and not turun and count_tot % 2 == 1:
         Arm.write(command.encode("utf-8"))
-        delay(1.5)
+        delay(1.45)
         Mega.write("2\n".encode("UTF-8"))
-        delay(1.8)
+        delay(1.85)
         Mega.write("5\n".encode("UTF-8"))
-        delay(1.3)
+        delay(1.4)
         taruhSampahMaju(detected)
-        delay(0.1)               
+        # delay(0.01)               
         turun = True
         Sedot = True
         Arms = False
@@ -886,9 +932,9 @@ while True:
         # taruhSampah(detected)
     elif Sedot and turun and not Arms and count_tot % 2 == 1 and tengah:
         taruhSampahMaju(detected)
-        delay(0.75)
+        delay(0.7)
         Mega.write("4\n".encode("UTF-8"))
-        delay(0.27)
+        delay(0.3)
         detected.clear()
         count_tot += 1
         Sedot = False
@@ -896,7 +942,6 @@ while True:
         turun = False
         tengah = False
     
-
     if cv2.waitKey(1) & 0xFF == ord("q") or not thread_kamera.is_alive():
         Mega.close()
         Arm.close()
