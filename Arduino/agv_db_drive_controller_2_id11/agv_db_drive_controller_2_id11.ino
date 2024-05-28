@@ -137,11 +137,11 @@ void com_agv_motor(int dSL, int dSR) {
 }
 
 void majuKenceng() {
-  com_agv_motor(25, 25);
+  com_agv_motor(24, 24);
 }
 
 void majuKencengToMid() {
-  com_agv_motor(20, 20); 
+  com_agv_motor(21, 21); 
 }
 
 void majuPelan() {
@@ -149,7 +149,7 @@ void majuPelan() {
 } 
 
 void majuPelanToMid() { 
-  com_agv_motor(20, 20);
+  com_agv_motor(21, 21);
 }
 
 void majuNgiri() {
@@ -161,11 +161,11 @@ void majuNganan() {
 } 
 
 void mundurKenceng() {
-  com_agv_motor(-25, -25);
+  com_agv_motor(-24, -24);
 }
 
 void mundurKencengToMid() {
-  com_agv_motor(-20, -20);
+  com_agv_motor(-21, -21);
 }
  
 void mundurPelan() {
@@ -173,7 +173,7 @@ void mundurPelan() {
 }
 
 void mundurPelanToMid() {
-  com_agv_motor(-20, -20);
+  com_agv_motor(-21, -21);
 }
 
 void mundurNgiriToMid() {
@@ -217,6 +217,7 @@ void Stop() {
 // define two tasks for Blink & AnalogRead
 void TaskComm(void *pvParameters);
 void TaskMotor(void *pvParameters);
+void sensor(void *pvParameters);
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -247,6 +248,12 @@ void setup() {
     ,
     NULL);
 
+  xTaskCreate(
+    sensor, "sensor", 128  // Stack size
+    ,
+    NULL, 1  // Priority
+    ,
+    NULL);
   // Now the task scheduler, which takes over control of scheduling individual tasks, is automatically started.
 }
 
@@ -308,4 +315,14 @@ void TaskMotor(void *pvParameters)  // This is a task.
 
     vTaskDelay(1);
   }
+}
+
+void sensor(void *pvParameters)
+{
+  (void)pvParameters;
+
+  for (;;) {
+    Serial.println(CountR);
+  }
+    
 }
