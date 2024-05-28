@@ -141,7 +141,7 @@ void majuKenceng() {
 }
 
 void majuKencengToMid() {
-  com_agv_motor(24, 24); 
+  com_agv_motor(26, 26); 
 }
 
 void majuPelan() {
@@ -165,7 +165,7 @@ void mundurKenceng() {
 }
 
 void mundurKencengToMid() {
-  com_agv_motor(-24, -24);
+  com_agv_motor(-26, -26);
 }
  
 void mundurPelan() {
