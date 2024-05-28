@@ -39,9 +39,9 @@ void read_encoder() {
   if (newPositionL != oldPositionL || newPositionR != oldPositionR) {
     oldPositionL = newPositionL;
     oldPositionR = newPositionR;
-    // Serial.print(newPositionL);
-    // Serial.print('\t');
-    // Serial.println(newPositionR);  // Serial.print('\t');
+    Serial.print(newPositionL);
+    Serial.print('\t');
+    Serial.println(newPositionR);  // Serial.print('\t');
   }
 }
 
@@ -103,7 +103,7 @@ void com_agv_motor(int dSL, int dSR) {
 
   //42.2 = pulse_rotation/(k_wheel)
 
-  // Serial.println(CountL);
+  // Serial.print(CountL);
   // Serial.print("\t");
   // Serial.println(CountR);
 
@@ -141,7 +141,7 @@ void majuKenceng() {
 }
 
 void majuKencengToMid() {
-  com_agv_motor(21, 21);
+  com_agv_motor(26, 26);
 }
 
 void majuPelan() {
@@ -149,7 +149,7 @@ void majuPelan() {
 }
 
 void majuPelanToMid() {
-  com_agv_motor(21, 21);
+  com_agv_motor(20, 20);
 }
 
 void majuNgiri() {
@@ -166,7 +166,7 @@ void mundurKenceng() {
 
 
 void mundurKencengToMid() {
-  com_agv_motor(-21, -21);
+  com_agv_motor(-26, -26);
 }
 
 void mundurPelan() {
@@ -174,7 +174,7 @@ void mundurPelan() {
 }
 
 void mundurPelanToMid() {
-  com_agv_motor(-21, -21);
+  com_agv_motor(-20, -20);
 }
 
 void mundurNgiriToMid() {
@@ -194,7 +194,7 @@ void mundurNganan() {
 }
 
 void SlideL() {
-  com_agv_motor(30, -30);
+  com_agv_motor(31, -31);
 }
 
 void Stop() {
@@ -218,7 +218,6 @@ void Stop() {
 // define two tasks for Blink & AnalogRead
 void TaskComm(void *pvParameters);
 void TaskMotor(void *pvParameters);
-void sensor(void *pvParameters);
 
 // the setup function runs once when you press reset or power the board
 void setup() {
@@ -249,12 +248,6 @@ void setup() {
     ,
     NULL);
 
-  xTaskCreate(
-    sensor, "sensor", 128  // Stack size
-    ,
-    NULL, 1  // Priority
-    ,
-    NULL);
   // Now the task scheduler, which takes over control of scheduling individual tasks, is automatically started.
 }
 
@@ -269,7 +262,7 @@ void TaskComm(void *pvParameters) {
   (void)pvParameters;
 
   for (;;) {
-    if (Serial.available() > 0) { 
+    if (Serial.available() > 0) {
       input = Serial.readStringUntil('\n');
       // int spaceIndex = input.indexOf(' ');
       // // CountL = 0, CountR = 0;
@@ -278,6 +271,7 @@ void TaskComm(void *pvParameters) {
       //  spdR = input.substring(spaceIndex + 1).toInt();
       // }
     }
+
     vTaskDelay(1);
   }
 }
@@ -311,18 +305,11 @@ void TaskMotor(void *pvParameters)  // This is a task.
     //Untuk Start
     else if (input == "L") {
       SlideL();
+      if (CountL >= 95 || CountR >= 95) {
+        Stop();
+      }
     } else Stop();
 
     vTaskDelay(1);
   }
-}
-
-void sensor(void *pvParameters)
-{
-  (void)pvParameters;
-
-  for (;;) {
-    Serial.println(CountR);
-  }
-    
 }
