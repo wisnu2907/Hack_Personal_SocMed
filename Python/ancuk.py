@@ -21,8 +21,6 @@ kiri_habis = False
 center_x_cm = 0
 center_y_cm = 0
 count_tot = 0
-counter =0
-counter2 =0
 
 detected = []
 received_array = []
@@ -30,13 +28,13 @@ class_name = ""
 command = ""
 
 # Initialize the YOLO model
-model = YOLO(r"C:\Ndaru\KRTMI\programming\best.pt")
+model = YOLO(r"C:\Users\wisnu\Coding\KRTMI2024\Python\best.pt")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.model.to(device)
 
 print("Using device:", device)
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 cap.set(cv2.CAP_PROP_AUTOFOCUS, 1)
 
 # Define the colors for the bounding boxes
@@ -52,10 +50,10 @@ if os.path.exists(calibration_file):
 else:
     calibrated = False
 
-Mega = serial.Serial("COM12", 9600)
-Arm = serial.Serial("COM11", 1000000)
-B = serial.Serial("COM5", 9600)  # ID 10
-F = serial.Serial("COM6", 9600)  # ID 11
+Mega = serial.Serial("COM5", 9600, timeout= 1)
+Arm = serial.Serial("COM1", 1000000)
+B = serial.Serial("COM8", 9600)  # ID 10
+F = serial.Serial("COM7", 9600)  # ID 11
 
 
 if B.is_open:
@@ -89,43 +87,13 @@ def stop():
     B.write("0".encode("utf-8"))
     F.write("0".encode("utf-8"))
 
-def slideL():
-    B.write("L\n".encode("utf-8"))
-    F.write("L\n".encode("utf-8"))
-
-
-
-def baca_encoder():
-    global counter
-    while True:
-        counter = B.readline().decode().rstrip()
-        print(counter)
-
-
-thread_enc = threading.Thread(target=baca_encoder)
-thread_enc.daemon = True
-thread_enc.start()
-delay(2)
-
-print("menunggu nyala")
-
-B.write("L\n".encode("utf-8"))
-F.write("L\n".encode("utf-8"))
-while True:
-    # delay(0.02)
-    if float(counter) >=95 :
-        stop()
-        break
-
-
 def baca_sensor():
     global data, received_array
     while True:
         data = Mega.readline().decode().rstrip()
         received_array = list(map(int, data.split(",")))
         # print("Received array:", received_array)
-
-
+        
 def deteksi_objek():
     global  objek_terdeteksi, logitune, ret, frame, cap, class_name, detected, center_x_cm, center_y_cm, command
     while True:
@@ -164,7 +132,7 @@ def deteksi_objek():
 
             center_x_cm = ((x1 + x2) / 2 - frame.shape[1] / 2) * ratio_px_cm
             center_y_cm = (frame.shape[0] - ((y1 + y2) / 2)) * ratio_px_cm
-            command = f"{center_x_cm + 6.5:.5f} {center_y_cm - 0.3:.5f}\n"
+            command = f"{center_x_cm + 5.5:.5f} {center_y_cm + 2:.5f}\n"
 
             label_size, _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
             cv2.putText(
@@ -190,17 +158,7 @@ def deteksi_objek():
         cv2.imshow("Astro_24", frame)
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
-
-
-thread_kamera = threading.Thread(target=deteksi_objek)
-thread_kamera.daemon = True
-thread_kamera.start()
-
-thread_sensor = threading.Thread(target=baca_sensor)
-thread_sensor.daemon = True
-thread_sensor.start()
-
-
+        
 def taruhSampahMaju(detected):
     if detected:
         if detected[0] == "Ferro":
@@ -226,7 +184,6 @@ def taruhSampahMundur(detected):
             Arm.write("4".encode("utf-8"))
         elif detected[0] in ["Daun-Basah", "Daun-Kering"]:
             Arm.write("5".encode("utf-8"))
-
 
 def kondisiMaju():
     global received_array, tengah, kanan_habis
@@ -518,7 +475,6 @@ def kondisiMajuKeObjek():
         B.write("e".encode('utf-8'))
         F.write("e".encode('utf-8'))
 
-
 def kondisiMundur():
     global received_array, tengah, kiri_habis
     if len(received_array) < 9:
@@ -807,8 +763,25 @@ def kondisiMundurKeObjek():
     else :
         B.write("5".encode('utf-8'))
         F.write("5".encode('utf-8'))
+        
+while True:
+    start = input("start ga bos?: ")
+    if start == "y" or "Y":
+        F.write("L".encode("UTF-8"))
+        B.write("L".encode("UTF-8"))
+        delay(2.55)
+        stop()
+        break
 
-delay(10)
+thread_kamera = threading.Thread(target=deteksi_objek)
+thread_kamera.daemon = True
+thread_kamera.start()
+
+thread_sensor = threading.Thread(target=baca_sensor)
+thread_sensor.daemon = True
+thread_sensor.start()
+
+delay(2.7)
 while True:
     # kondisiMajuKeObjek()
     # print("di luar cuy")
@@ -831,9 +804,9 @@ while True:
             # Arms = False
         elif center_x_cm <= 9  and center_x_cm >= -13 and not Sedot and not Arms  and not turun:
             stop() 
-            delay(1.3)
+            delay(1.35)
             detected.append(class_name)
-            delay(0.1)
+            delay(0.01)
             Arm.write(command.encode("utf-8"))
             Arms = True
             
@@ -841,11 +814,11 @@ while True:
         Arm.write(command.encode("utf-8"))
         delay(1.5)
         Mega.write("2\n".encode("UTF-8"))
-        delay(1.8)
+        delay(1.9)
         Mega.write("5\n".encode("UTF-8"))
-        delay(1.3)
+        delay(1.4)
         taruhSampahMundur(detected)
-        delay(0.1)               
+        # delay(0.01)               
         turun = True
         Sedot = True
         Arms = False
@@ -856,7 +829,7 @@ while True:
         taruhSampahMundur(detected)
         delay(0.75)
         Mega.write("4\n".encode("UTF-8"))
-        delay(0.27)
+        delay(0.29)
         detected.clear()
 
         count_tot += 1
@@ -887,20 +860,20 @@ while True:
             
         elif center_x_cm <= 13  and center_x_cm >= -9 and not Sedot and not Arms  and not turun:
             stop() 
-            delay(1.3)
+            delay(1.35)
             detected.append(class_name)
-            delay(0.1)
+            delay(0.01)
             Arm.write(command.encode("utf-8"))
             Arms = True
     elif Arms and not Sedot and not turun and count_tot % 2 == 1:
         Arm.write(command.encode("utf-8"))
         delay(1.5)
         Mega.write("2\n".encode("UTF-8"))
-        delay(1.8)
+        delay(1.9)
         Mega.write("5\n".encode("UTF-8"))
-        delay(1.3)
+        delay(1.4)
         taruhSampahMaju(detected)
-        delay(0.1)               
+        # delay(0.01)               
         turun = True
         Sedot = True
         Arms = False
@@ -911,7 +884,7 @@ while True:
         taruhSampahMaju(detected)
         delay(0.75)
         Mega.write("4\n".encode("UTF-8"))
-        delay(0.27)
+        delay(0.29)
         detected.clear()
         count_tot += 1
         Sedot = False
