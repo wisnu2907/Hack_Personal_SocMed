@@ -28,13 +28,15 @@ class_name = ""
 command = ""
 
 # Initialize the YOLO model
-model = YOLO(r"C:\Ndaru\KRTMI\programming\best.pt")
+# model = YOLO(r"C:\Ndaru\KRTMI\programming\best.pt")
+# model = YOLO(r"C:\Users\NDARU\Downloads\rev1.pt")
+model = YOLO(r"C:\Users\NDARU\Downloads\rev2.pt")
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 model.model.to(device)
 
 print("Using device:", device)
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 # cap = cv2.VideoCapture(1, cv2.CAP_DSHOW)
 cap.set(cv2.CAP_PROP_AUTOFOCUS, 1)
 
@@ -51,8 +53,8 @@ if os.path.exists(calibration_file):
 else:
     calibrated = False
 
-Mega = serial.Serial("COM7", 9600, timeout= 1)
-Arm = serial.Serial("COM9", 1000000)
+Mega = serial.Serial("COM12", 9600)
+Arm = serial.Serial("COM8", 1000000)
 B = serial.Serial("COM5", 9600)  # ID 10
 F = serial.Serial("COM6", 9600)  # ID 11
 
@@ -134,7 +136,7 @@ def deteksi_objek():
 
             center_x_cm = ((x1 + x2) / 2 - frame.shape[1] / 2) * ratio_px_cm
             center_y_cm = (frame.shape[0] - ((y1 + y2) / 2)) * ratio_px_cm
-            command = f"{center_x_cm + 7:.5f} {center_y_cm+2.5:.5f}\n"
+            command = f"{center_x_cm + 6.5:.5f} {center_y_cm:.5f}\n"
 
             label_size, _ = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)
             cv2.putText(
@@ -196,8 +198,7 @@ def taruhSampahMajungide(detected):
     command = switch_case(category)
     if command:
         Arm.write(command.encode("utf-8"))
-
-            
+   
 def taruhSampahMundur(detected):
     if detected:
         if detected[0] == "Ferro":
@@ -250,7 +251,7 @@ def kondisiMajuNoLine():
         tengah = False
 
 def kondisiMundurNoLine():
-    global received_array, tengah, kanan_habis
+    global received_array, tengah, kiri_habis
     if (received_array[0] == 1 and received_array[1] == 1 and received_array[2] == 1 and 
             received_array[3] == 1 and received_array[4] == 1 and received_array[5] == 1 and 
             received_array[6] == 1   and received_array[7] == 1 and received_array[8] == 1):
@@ -258,7 +259,7 @@ def kondisiMundurNoLine():
         B.write("0".encode('utf-8'))
         F.write("0".encode('utf-8'))
         tengah = False
-        kanan_habis= True
+        kiri_habis= True
     else:
         B.write("1".encode('utf-8'))
         F.write("1".encode('utf-8'))
@@ -858,7 +859,7 @@ while True:
     if start == "":
         F.write("L".encode("UTF-8"))
         B.write("L".encode("UTF-8"))
-        delay(1.61)
+        delay(3.37)
         stop()
         break
 
@@ -868,33 +869,24 @@ thread_sensor.start()
 
 delay(1.5)
 while True:
-    # kondisiMajuKeObjek()
-    # print("di luar cuy")
     time.sleep(0.021)
     if not objek_terdeteksi and count_tot % 2 == 0 and not Sedot and not tengah and not Arms:
         Mega.write("1\n".encode("utf-8"))
-        # B.write("a".encode('utf-8'))
-        # F.write("a".encode('utf-8'))
         Arm.write("0 20\n".encode("utf-8")) 
         if kanan_habis:
             stop()
             turun = True
             Sedot = True
-            Arms = False
-            
+            Arms = False          
         else:
             kondisiMajuNoLine()
-            # B.write("a".encode('utf-8'))
-            # F.write("a".encode('utf-8'))
-            # tengah = False
             Mega.write("1\n".encode("utf-8"))
     elif objek_terdeteksi and count_tot % 2 == 0  and not Sedot and not tengah and not Arms and not kanan_habis:
-        if center_x_cm > 9 and not Arms:
+        if center_x_cm > 6 and not Arms:
             Arm.write("0 20\n".encode("utf-8"))
             kondisiMajuKeObjek()
             Arms = False
-
-        elif center_x_cm <= 9  and center_x_cm >= -13 and not Sedot and not Arms  and not turun:
+        elif center_x_cm <= 6  and center_x_cm >= -13 and not Sedot and not Arms  and not turun and not kanan_habis:
             stop() 
             delay(1)
             detected.append(class_name)
@@ -905,34 +897,32 @@ while True:
             kondisiMaju()
             
     elif Arms and not Sedot and not turun and count_tot % 2 == 0:
-        # t1 = time.time()
         Arm.write(command.encode("utf-8"))
         delay(1.15)
-        # print(time.time()-t1)
         Mega.write("2\n".encode("UTF-8"))
-        # delay(2.45)
+        delay(0.3)
+        Mega.write("2\n".encode("UTF-8"))
+        delay(0.3)
+        Mega.write("2\n".encode("UTF-8"))
+        delay(0.3)
+        Mega.write("2\n".encode("UTF-8"))
         delay(2.5)
-        # print(time.time()-t1)
         Mega.write("5\n".encode("UTF-8"))
         delay(1.3)
-        taruhSampahMundur(detected)
-        # delay(0.01)               
+        taruhSampahMundur(detected)               
         turun = True
         Sedot = True
         Arms = False
     elif Sedot and turun and not Arms and count_tot % 2 == 0 and not tengah:
         kondisiMundurKeTengah()
-        # taruhSampah(detected)
     elif Sedot and turun and not Arms and count_tot % 2 == 0 and tengah:
         taruhSampahMundur(detected)
-        # delay(1)
         Mega.write("2\n".encode("UTF-8"))
-        delay(1)
+        delay(1.3)
         Mega.write("4\n".encode("UTF-8"))
-        delay(0.3)
         Mega.write("1\n".encode("UTF-8"))
+        delay(0.3)
         detected.clear()
-
         count_tot += 1
         Sedot = False
         Arms = False
@@ -952,17 +942,15 @@ while True:
             Sedot = True
             Arms = False
         else:
-            # kondisiMundur()
             kondisiMundurNoLine()
-            Mega.write("1\n".encode("utf-8"))
+            Mega.write("1\n".encode("utf-8"))          
+    elif objek_terdeteksi and count_tot % 2 == 1 and not Sedot and not tengah and not Arms and not kiri_habis:
+        if  center_x_cm < -6 and not Arms:
+            Arm.write("0 20\n".encode("utf-8"))
+            kondisiMundurKeObjek()
+            Arms = False
             
-    elif objek_terdeteksi and count_tot % 2 == 1 and not Sedot and not tengah and not Arms:
-        # if  center_x_cm < -9 and not Arms:
-        #     Arm.write("0 20\n".encode("utf-8"))
-        #     kondisiMundurKeObjek()
-        #     Arms = False
-            
-        if center_x_cm <= 13  and center_x_cm >= -9 and not Sedot and not Arms  and not turun:
+        elif center_x_cm <= 13  and center_x_cm >= -6 and not Sedot and not Arms  and not turun and not kiri_habis:
             stop() 
             delay(1)
             detected.append(class_name)
@@ -971,29 +959,33 @@ while True:
             Arms = True
         else:
             kondisiMundur()
+
     elif Arms and not Sedot and not turun and count_tot % 2 == 1:
         Arm.write(command.encode("utf-8"))
         delay(1.15)
         Mega.write("2\n".encode("UTF-8"))
+        delay(0.3)
+        Mega.write("2\n".encode("UTF-8"))
+        delay(0.3)
+        Mega.write("2\n".encode("UTF-8"))
+        delay(0.3)
+        Mega.write("2\n".encode("UTF-8"))
         delay(2.5)
         Mega.write("5\n".encode("UTF-8"))
         delay(1.3)
-        taruhSampahMaju(detected)
-        # delay(0.01)               
+        taruhSampahMaju(detected)              
         turun = True
         Sedot = True
         Arms = False
     elif Sedot and turun and not Arms and count_tot % 2 == 1 and not tengah:
         kondisiMajuKeTengah()
-        # taruhSampah(detected)
     elif Sedot and turun and not Arms and count_tot % 2 == 1 and tengah:
         taruhSampahMaju(detected)
-        # delay(1)
         Mega.write("2\n".encode("UTF-8"))
         delay(1.3)
         Mega.write("4\n".encode("UTF-8"))
-        delay(0.3)
         Mega.write("1\n".encode("UTF-8"))
+        delay(0.3)
         detected.clear()
         count_tot += 1
         Sedot = False
@@ -1001,7 +993,7 @@ while True:
         turun = False
         tengah = False
     
-    if cv2.waitKey(1) & 0xFF == ord("q") or not thread_kamera.is_alive():
+    elif cv2.waitKey(1) & 0xFF == ord("q") or not thread_kamera.is_alive():
         Mega.close()
         Arm.close()
         F.close()
