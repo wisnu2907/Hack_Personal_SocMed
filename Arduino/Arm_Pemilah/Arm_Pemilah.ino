@@ -80,42 +80,43 @@ void joint2(unsigned int pos2, int speed) {
 }
 
 void sampah1a() {
-  driveServo(40, 64, 0x3FF/8, 0x3FF/5);
+  driveServo(41-0.1, 64, 0x3FF/8, 0x3FF/5);
+}
+
+void sampah1b() {
+  driveServo(40-6.5, 64, 0x3FF/8, 0x3FF/5);
 }
 
 void sampah2a() {
-  driveServo(19.5, 64, 0x3FF/8, 0x3FF/5);
-}
-
-void sampah3a() {
-  driveServo(0, 66, 0x3FF/8, 0x3FF/5);
-}
-
-void sampah4a() {
-  driveServo(-21.5, 63, 0x3FF/8, 0x3FF/5);
-}
-
-void sampah5a() {
- driveServo(-40, 62, 0x3FF/8, 0x3FF/5);
-}
-void sampah1b() {
-  driveServo(40-6.5, 64, 0x3FF/8, 0x3FF/5);
+  driveServo(19.5+2.5, 64, 0x3FF/8, 0x3FF/5);
 }
 
 void sampah2b() {
   driveServo(19.5-6.5, 64, 0x3FF/8, 0x3FF/5);
 }
 
+void sampah3a() {
+  driveServo(0+2, 66, 0x3FF/8, 0x3FF/5);
+}
+
 void sampah3b() {
-  driveServo(0-6.5, 66, 0x3FF/8, 0x3FF/5);
+  driveServo(0-6.5+1.5, 66, 0x3FF/8, 0x3FF/5);
+}
+
+void sampah4a() {
+  driveServo(-21.5+2.5+1.5, 63, 0x3FF/8, 0x3FF/5);
 }
 
 void sampah4b() {
-  driveServo(-21.5-6.5, 63, 0x3FF/8, 0x3FF/5);
+  driveServo(-21.5-6.5+2+1.75, 63, 0x3FF/8, 0x3FF/5);
+}
+
+void sampah5a() {
+ driveServo(-40+2+1.5, 62, 0x3FF/8, 0x3FF/5);
 }
 
 void sampah5b() {
- driveServo(-40-3.5, 62, 0x3FF/8, 0x3FF/5);
+ driveServo(-40-4, 61, 0x3FF/8, 0x3FF/5);
 }
 
 // Setup function to initialize Serial communication and Dynamixel servos
