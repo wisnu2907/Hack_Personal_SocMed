@@ -870,6 +870,7 @@ thread_sensor.start()
 delay(1.5)
 while True:
     time.sleep(0.021)
+    Arm.write("9".encode("utf-8"))
     if not objek_terdeteksi and count_tot % 2 == 0 and not Sedot and not tengah and not Arms:
         Mega.write("1\n".encode("utf-8"))
         Arm.write("0 20\n".encode("utf-8")) 
