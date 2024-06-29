@@ -247,7 +247,9 @@ void agv_motor(int ll, int rr) {
 
 void com_agv_motor(int dSL, int dSR) {
   int dRL = 0, dRR = 0;
-  delay(13);
+  delay(12);
+  // delay(13);
+
   dRL = abs(myEncL.read());
   dRR = abs(myEncR.read());
 
@@ -703,7 +705,7 @@ void TaskMajuAwal(void *pvParameters) {
       // Serial.print(CountL);
       // Serial.print("  CountR:");
       // Serial.println(CountR);
-      if (CountL >= 434) {
+      if (CountL >= 434.5) {
         // if (CountL >= 200) {
 
         Stop();
@@ -713,6 +715,7 @@ void TaskMajuAwal(void *pvParameters) {
         delay(200);
         vTaskResume(TaskHandle_TaskLeft);
         vTaskDelete(TaskHandle_TaskMajuAwal);
+        delay(100);
       }
     }
   }
@@ -737,7 +740,7 @@ void TaskLeft(void *pvParameters) {
 
     // Serial.println(CountL);
     // if (CountL >= 34.5) {
-      if (CountL >= 34) {
+    if (CountL >= 34) {
 
       Stop();
       delay(1000);
@@ -746,6 +749,7 @@ void TaskLeft(void *pvParameters) {
       delay(200);
       vTaskResume(TaskHandle_TaskMajuKedua);
       vTaskDelete(TaskHandle_TaskLeft);
+      delay(100);
     }
   }
 }
@@ -766,6 +770,9 @@ void TaskMajuKedua(void *pvParameters) {
     if (CountL >= 136) {
       // if (CountL >= 100) {
       Stop();
+      delay(500);
+      CountL = 0;
+      CountR = 0;
       delay(500);
       vTaskResume(TaskHandle_TaskArmPemilah);
       // vTaskResume(TaskHandle_TaskComm);
