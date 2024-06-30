@@ -6,7 +6,6 @@
 const int numArrays = 5;
 const int arraySize = 3;
 float arrays[numArrays][arraySize];
-bool terhisap = false;
 
 //DXL SETUP
 //--------------------------------------//
@@ -25,6 +24,7 @@ bool terhisap = false;
 #define CCW_LIMIT_ANGLE_MX 0xFFF
 #define CCW_LIMIT_ANGLE_AX 0x3FF
 
+
 // Calculate the center position of the servo
 unsigned int tegak_mx = CCW_LIMIT_ANGLE_MX / 2;
 unsigned int tegak_ax = CCW_LIMIT_ANGLE_AX / 2;
@@ -32,6 +32,26 @@ unsigned int tegak_ax = CCW_LIMIT_ANGLE_AX / 2;
 // Define the lengths of the links
 float L1 = 38.1;  // cm
 float L2 = 37.4;  // cm
+
+//setup mpu
+#include <Wire.h>
+#include <MPU6050.h>
+
+MPU6050 mpu;
+
+// Variabel untuk kalibrasi
+float gyroZ_calibration = 0;
+const int calibration_samples = 1000;
+
+// Variabel untuk filter rata-rata bergerak
+const int filter_window_size = 10;  // Ukuran jendela filter
+float gyroZ_values[filter_window_size];
+int filter_index = 0;
+bool filter_full = false;
+
+// Variabel untuk menghitung sudut
+float angleZ = 0;
+unsigned long last_time;
 
 unsigned int Deg_mx(float degm) {
   float pos_floatm = degm / 0.08789;
@@ -165,7 +185,10 @@ void servo4(unsigned int pos4, int speed) {
 //--------------------------------------//
 
 float pulse_rotation = 532;  //
-#define d_wheel 15           // cm
+#define d_wheel 15.2 * PI    // cm
+const float dwheel = 0.15;
+const float wheelBase = 46.2;
+
 float k_wheel = 3.14 * 15.2;
 /*
    range speed -50 0 50
@@ -204,6 +227,14 @@ long oldPositionR = -999;
 // float kp = 1.11;
 float kp = 0.3;
 float kd = 0.4;
+
+float theta = 0.0;  // Robot orientation
+float thetaErr = 0.0;
+float lastThetaErr = 0.0;
+float sumThetaErr = 0.0;
+float thetaCorrection = 0.0;
+float delta_theta = 0;
+float dThetaErr = 0;
 
 void read_encoder() {
   long newPositionL = myEncL.read();
@@ -247,9 +278,7 @@ void agv_motor(int ll, int rr) {
 
 void com_agv_motor(int dSL, int dSR) {
   int dRL = 0, dRR = 0;
-  delay(12);
-  // delay(13);
-
+  delay(13);
   dRL = abs(myEncL.read());
   dRR = abs(myEncR.read());
 
@@ -258,9 +287,6 @@ void com_agv_motor(int dSL, int dSR) {
 
   //42.2 = pulse_rotation/(k_wheel)
 
-  // Serial.print(CountL);
-  // Serial.print("\t");
-  // Serial.println(CountR);
 
   myEncL.write(0);
   myEncR.write(0);
@@ -288,11 +314,172 @@ void com_agv_motor(int dSL, int dSR) {
   else if (dSR > 0) pwmR = SpeedR;
   else pwmR = 0;
 
+  // Serial.print(pwmL);
+  // Serial.print("\t");
+  // Serial.println(pwmR);
   // Serial.println(mErrL);
   agv_motor(pwmL, pwmR);
   // Serial.println(0);
 }
 
+void com_agv_motor_odometry(int dSL, int dSR) {
+  int dRL = 0, dRR = 0;
+  delay(13);
+  dRL = abs(myEncL.read());
+  dRR = abs(myEncR.read());
+
+  CountL += (float)dRL / 11.14;
+  CountR += (float)dRR / 11.14;
+
+  myEncL.write(0);
+  myEncR.write(0);
+
+  // if (dRL != oldPositionL || dRR != oldPositionR) {
+  //   oldPositionL = dRL;
+  //   oldPositionR = dRR;
+  // Serial.print(dRL);
+  // Serial.print('\t');
+  // Serial.print(dRR);
+  // Serial.print('\t');
+
+  delta_theta = (dRR - dRL) * (d_wheel / wheelBase) / pulse_rotation;
+  Serial.println(delta_theta);
+  theta += delta_theta;
+
+  // Calculate PID for theta
+  thetaErr = 0.0 - theta;
+  sumThetaErr += thetaErr;
+  dThetaErr = thetaErr - lastThetaErr;
+  lastThetaErr = thetaErr;
+
+  thetaCorrection = (float)(0.01 * thetaErr) + (float)(0.00 * dThetaErr) + (float)(0 * sumThetaErr);
+  // thetaCorrection = (float)(2 * thetaErr) + (float)(4 * dThetaErr) + (float)(0 * sumThetaErr);
+
+  // Print theta (orientation)
+  // Serial.println(theta);
+  // }
+
+
+  SpeedL = dSL - thetaCorrection;
+  SpeedR = dSR + thetaCorrection;
+
+  if (SpeedL >= 255) SpeedL = 255;
+  if (SpeedR >= 255) SpeedR = 255;
+
+  if (dSL < 0) pwmL = -SpeedL;
+  else if (dSL > 0) pwmL = SpeedL;
+  else pwmL = 0;
+  if (dSR < 0) pwmR = -SpeedR;
+  else if (dSR > 0) pwmR = SpeedR;
+  else pwmR = 0;
+
+  Serial.print(SpeedL);
+  Serial.print("\t");
+  Serial.println(SpeedR);
+
+  agv_motor(pwmL, pwmR);
+}
+
+
+void com_agv_motor_MPU(int dSL, int dSR) {
+  int dRL = 0, dRR = 0;
+  delay(13);
+  dRL = abs(myEncL.read());
+  dRR = abs(myEncR.read());
+
+  CountL += (float)dRL / 11.14;
+  CountR += (float)dRR / 11.14;
+
+  Serial.println(CountL);
+
+  //42.2 = pulse_rotation/(k_wheel)
+
+
+  myEncL.write(0);
+  myEncR.write(0);
+
+  thetaErr = 0.0 - angleZ;
+  sumThetaErr += thetaErr;
+  dThetaErr = thetaErr - lastThetaErr;
+  lastThetaErr = thetaErr;
+
+  thetaCorrection = (float)(1 * thetaErr) + (float)(0.00 * dThetaErr) + (float)(0 * sumThetaErr);
+  // thetaCorrection = (float)(2 * thetaErr) + (float)(4 * dThetaErr) + (float)(0 * sumThetaErr);
+
+  // Print theta (orientation)
+  // Serial.println(theta);
+  // }
+
+
+  SpeedL = dSL - thetaCorrection;
+  SpeedR = dSR + thetaCorrection;
+
+  if (SpeedL >= 255) SpeedL = 255;
+  if (SpeedR >= 255) SpeedR = 255;
+
+  if (dSL < 0) pwmL = -SpeedL;
+  else if (dSL > 0) pwmL = SpeedL;
+  else pwmL = 0;
+  if (dSR < 0) pwmR = -SpeedR;
+  else if (dSR > 0) pwmR = SpeedR;
+  else pwmR = 0;
+
+  // Serial.print(SpeedL);
+  // Serial.print("\t");
+  // Serial.println(SpeedR);
+
+  agv_motor(pwmL, pwmR);
+}
+
+void com_agv_motor_MPU2(int dSL, int dSR) {
+  int dRL = 0, dRR = 0;
+  delay(13);
+  dRL = abs(myEncL.read());
+  dRR = abs(myEncR.read());
+
+  CountL += (float)dRL / 11.14;
+  CountR += (float)dRR / 11.14;
+
+  Serial.println(CountL);
+
+  //42.2 = pulse_rotation/(k_wheel)
+
+
+  myEncL.write(0);
+  myEncR.write(0);
+
+  thetaErr = -88.5 - angleZ;
+  sumThetaErr += thetaErr;
+  dThetaErr = thetaErr - lastThetaErr;
+  lastThetaErr = thetaErr;
+
+  thetaCorrection = (float)(1 * thetaErr) + (float)(0.00 * dThetaErr) + (float)(0 * sumThetaErr);
+  // thetaCorrection = (float)(2 * thetaErr) + (float)(4 * dThetaErr) + (float)(0 * sumThetaErr);
+
+  // Print theta (orientation)
+  // Serial.println(theta);
+  // }
+
+
+  SpeedL = dSL - thetaCorrection;
+  SpeedR = dSR + thetaCorrection;
+
+  if (SpeedL >= 255) SpeedL = 255;
+  if (SpeedR >= 255) SpeedR = 255;
+
+  if (dSL < 0) pwmL = -SpeedL;
+  else if (dSL > 0) pwmL = SpeedL;io
+  else pwmL = 0;
+  if (dSR < 0) pwmR = -SpeedR;
+  else if (dSR > 0) pwmR = SpeedR;
+  else pwmR = 0;
+
+  // Serial.print(SpeedL);
+  // Serial.print("\t");
+  // Serial.println(SpeedR);
+
+  agv_motor(pwmL, pwmR);
+}
 
 void Stop() {
   com_agv_motor(0, 0);
@@ -318,6 +505,7 @@ void TaskLeft(void *pvParameters);
 void TaskMajuKedua(void *pvParameters);
 void TaskArmPemilah(void *pvParameters);
 void TaskArmFollow(void *pvParameters);
+void TaskMPU(void *pvParameters);
 
 TaskHandle_t TaskHandle_TaskMajuAwal;
 TaskHandle_t TaskHandle_TaskLeft;
@@ -325,11 +513,14 @@ TaskHandle_t TaskHandle_TaskMajuKedua;
 TaskHandle_t TaskHandle_TaskArmPemilah;
 TaskHandle_t TaskHandle_TaskComm;
 TaskHandle_t TaskHandle_TaskArmFollow;
+TaskHandle_t TaskHandle_TaskMPU;
 
 
 void setup() {
   Serial.begin(1000000);
   Serial2.begin(9600);
+  Wire.begin();
+  mpu.initialize();
   // Serial.setTimeout(1);
   // Serial2.setTimeout(1);
   init_motor();
@@ -346,23 +537,52 @@ void setup() {
   Dynamixel.setMode(ID3, SERVO, CW_LIMIT_ANGLE, CCW_LIMIT_ANGLE_AX);
   Dynamixel.setMode(ID4, SERVO, CW_LIMIT_ANGLE, CCW_LIMIT_ANGLE_AX);
 
-  servo2(tegak_mx - Deg_mx(179.5), 0x3FF / 10);
-  servo1(tegak_mx - Deg_mx(89), 0x3FF / 10);
-  // servo2(tegak_mx + Deg_mx(179.5), 0x3FF / 6);
-  // servo1(tegak_mx + Deg_mx(90), 0x3FF / 10);
+  servo2(tegak_mx + Deg_mx(179.5), 0x3FF / 10);
+  servo1(tegak_mx + Deg_mx(90), 0x3FF / 10);
   servo3(tegak_ax, 1023 / 2);
   servo4(tegak_ax, 1023 / 2);
+
+
+
+  // Pastikan sensor terhubung
+  if (mpu.testConnection()) {
+    Serial.println("MPU6050 connection successful");
+  } else {
+    Serial.println("MPU6050 connection failed");
+    while (1)
+      ;
+  }
+
+  // Kalibrasi gyro Z
+  Serial.println("Calibrating gyro Z...");
+  for (int i = 0; i < calibration_samples; i++) {
+    mpu.getRotationZ();
+    gyroZ_calibration += mpu.getRotationZ();
+    delay(3);  // Delay untuk mendapatkan pembacaan stabil
+  }
+  gyroZ_calibration /= calibration_samples;
+  Serial.println("Calibration complete");
+
+  // Inisialisasi filter rata-rata bergerak
+  for (int i = 0; i < filter_window_size; i++) {
+    gyroZ_values[i] = 0;
+  }
+
+  // Inisialisasi waktu
+  last_time = millis();
 
   while (!Serial) {
     ;
   }
 
   xTaskCreate(TaskComm, "Comm", 128, NULL, 4, NULL);
-  xTaskCreate(TaskMajuAwal, "Motor", 128, NULL, 4, &TaskHandle_TaskMajuAwal);
+  xTaskCreate(TaskMajuAwal, "Motor", 128, NULL, 3, &TaskHandle_TaskMajuAwal);
   xTaskCreate(TaskLeft, "Motor", 128, NULL, 3, &TaskHandle_TaskLeft);
   xTaskCreate(TaskMajuKedua, "Motor", 128, NULL, 2, &TaskHandle_TaskMajuKedua);
   xTaskCreate(TaskArmPemilah, "Motor", 128, NULL, 1, &TaskHandle_TaskArmPemilah);
+  // xTaskCreate(TaskArmToSampah, "Motor", 128, NULL, 1, NULL);
   // xTaskCreate(TaskArmFollow, "Motor", 128, NULL, 1, &TaskHandle_TaskArmFollow);
+  xTaskCreate(TaskMPU, "MPU", 128, NULL, 4, NULL);
 }
 
 String input;
@@ -382,12 +602,13 @@ void lepas() {
   digitalWrite(vacuum, LOW);
 }
 
-void sampah5() {
+void sampah1() {
   // driveServo(39 + 3, 63 + 2, 0x3FF / 8, 0x3FF / 8);
-  servo1(tegak_mx + Deg_mx(33), 0x3FF / 7);
-  delay(1);
-  servo2(tegak_mx - Deg_mx(0), 0x3FF / 7);
-  delay(1);
+  // servo1(tegak_mx + Deg_mx(33), 0x3FF / 8);
+  // delay(1);
+  // servo2(tegak_mx - Deg_mx(0), 0x3FF / 8);
+  // delay(1);
+  driveServoSudutLuar(-36, 66, 0x3FF / 8, 0x3FF / 8);
   delay(2000);
   // posDefault();
   // delay
@@ -403,9 +624,8 @@ void sampah5() {
 }
 
 void sampah4() {
-  // driveServo(22, 63, 0x3FF / 7, 0x3FF / 7);
-  driveServoSudutDalam(22, 63, 0x3FF / 7, 0x3FF / 7);
-  delay(1500);
+  driveServoSudutLuar(22, 66, 0x3FF / 8, 0x3FF / 8);
+  delay(1400);
   // posDefault();
   // delay
   posServoUjungSampah(1000);
@@ -420,9 +640,8 @@ void sampah4() {
 }
 
 void sampah3() {
-  // driveServo(-1, 63, 0x3FF / 7, 0x3FF / 7);
-  driveServoSudutDalam(-1, 63, 0x3FF / 7, 0x3FF / 7);
-  delay(1500);
+  driveServoSudutLuar(-1, 66, 0x3FF / 8, 0x3FF / 8);
+  delay(1400);
   // posDefault();
   // delay
   posServoUjungSampah(1000);
@@ -437,10 +656,8 @@ void sampah3() {
 }
 
 void sampah2() {
-  // driveServo(-21, 63, 0x3FF / 7, 0x3FF / 7);
-  driveServoSudutDalam(-21, 63, 0x3FF / 7, 0x3FF / 7);
-
-  delay(1500);
+  driveServoSudutLuar(-21, 66, 0x3FF / 8, 0x3FF / 8);
+  delay(1400);
   // posDefault();
   // delay
   posServoUjungSampah(1000);
@@ -454,22 +671,24 @@ void sampah2() {
   delay(400);
 }
 
-void sampah1() {
+void sampah5() {
   // driveServo(-39 - 4, 63, 0x3FF / 8, 0x3FF / 8);
-  servo1(tegak_mx - Deg_mx(40), 0x3FF / 7);
+  servo1(tegak_mx - Deg_mx(40), 0x3FF / 8);
   delay(1);
-  servo2(tegak_mx + Deg_mx(0), 0x3FF / 7);
+  servo2(tegak_mx + Deg_mx(0), 0x3FF / 8);
   delay(1);
+  // driveServoSudutDalam(-36, 66, 0x3FF / 8, 0x3FF / 8);
+
   delay(2000);
   // posDefault();
   // delay
   posServoUjungSampah(1000);
-  delay(1000);
+  delay(600);
   // Release the trash
   lepas();
 
   // Move the arm back to default position
-  delay(1000);
+  delay(700);
   posDefault(1000, 1000);
   delay(400);
 }
@@ -477,8 +696,8 @@ void sampah1() {
 void posServoNgisep() {
   servo4(tegak_ax + Deg_ax(89), 700);
   delay(400);
-  servo3(tegak_ax - 300, 500);
-  servo4(tegak_ax, 501);
+  servo3(tegak_ax - Deg_ax(70), 500);
+  servo4(tegak_ax + Deg_ax(15), 501);
   delay(10);
 }
 
@@ -671,6 +890,44 @@ void TaskComm(void *pvParameters) {
   }
 }
 
+void TaskMPU(void *pvParameters) {
+  (void)pvParameters;
+
+  for (;;) {
+    unsigned long current_time = millis();
+    float dt = (current_time - last_time) / 1000.0;  // Interval waktu dalam detik
+    last_time = current_time;
+
+    int16_t gyroZ_raw = mpu.getRotationZ();
+    float gyroZ = (gyroZ_raw - gyroZ_calibration) / 131.0;  // 131.0 adalah sensitivitas gyro default dari MPU6050
+
+    // Masukkan nilai gyroZ ke dalam filter
+    gyroZ_values[filter_index] = gyroZ;
+    filter_index = (filter_index + 1) % filter_window_size;
+
+    if (filter_index == 0) {
+      filter_full = true;
+    }
+
+    // Hitung nilai rata-rata dari filter
+    float gyroZ_avg = 0;
+    int count = filter_full ? filter_window_size : filter_index;
+    for (int i = 0; i < count; i++) {
+      gyroZ_avg += gyroZ_values[i];
+    }
+    gyroZ_avg /= count;
+
+    // Hitung sudut berdasarkan gyroZ yang sudah difilter
+    angleZ += gyroZ_avg * dt;
+
+    // Tampilkan nilai sudut
+    Serial.print("Angle Z: ");
+    Serial.println(angleZ);
+
+    vTaskDelay(1);
+  }
+}
+
 
 void TaskMajuAwal(void *pvParameters) {
   (void)pvParameters;
@@ -687,7 +944,6 @@ void TaskMajuAwal(void *pvParameters) {
 
 
     if (digitalRead(bt1) == LOW) {
-      // delay(2000);
       for (int i = 0; i < 2; i++) {
         digitalWrite(buzzer, HIGH);
         delay(500);
@@ -699,13 +955,19 @@ void TaskMajuAwal(void *pvParameters) {
 
     if (count == 1) {
 
-      com_agv_motor(3, 3);
+      // com_agv_motor(6, 6);
+      com_agv_motor_MPU(30, 30);
+
+      // com_agv_motor_odometry(14, 14);
       // Serial.println(mErrL);
       // Serial.print("CountL:");
       // Serial.print(CountL);
       // Serial.print("  CountR:");
       // Serial.println(CountR);
-      if (CountL >= 434.5) {
+      // if (CountR >= 165678.64 - 1000) {
+      // if (CountR >= 109980 + 5000) {
+      if (CountR >= 431) {
+
         // if (CountL >= 200) {
 
         Stop();
@@ -735,13 +997,15 @@ void TaskLeft(void *pvParameters) {
     vTaskSuspend(TaskHandle_TaskMajuKedua);
     vTaskSuspend(TaskHandle_TaskArmPemilah);
 
-    com_agv_motor(2, -2);
+    com_agv_motor(4, -4);
+    // agv_motor(30, -30);
     // Serial.println(mErrL);
 
     // Serial.println(CountL);
-    // if (CountL >= 34.5) {
-    if (CountL >= 34) {
-
+    if (angleZ <= -86 && angleZ >= -91) {
+      // if (CountL >= 35.4) {
+      // com_agv_motor_MPU(20, -20);
+      // delay(2000);
       Stop();
       delay(1000);
       CountL = 0;
@@ -763,16 +1027,15 @@ void TaskMajuKedua(void *pvParameters) {
     // vTaskSuspend(TaskHandle_TaskComm);
     vTaskSuspend(TaskHandle_TaskArmPemilah);
 
-    com_agv_motor(2, 2);
+    com_agv_motor_MPU2(20, 20);
     // Serial.println(mErrL);
 
     // Serial.println(CountL);
-    if (CountL >= 136) {
+    // if (CountR >= 135) {
+    if (CountR >= 136) {
+
       // if (CountL >= 100) {
       Stop();
-      delay(500);
-      CountL = 0;
-      CountR = 0;
       delay(500);
       vTaskResume(TaskHandle_TaskArmPemilah);
       // vTaskResume(TaskHandle_TaskComm);
@@ -782,6 +1045,7 @@ void TaskMajuKedua(void *pvParameters) {
   }
 }
 
+//bool terhisap = false;
 
 void TaskArmPemilah(void *pvParameters) {
   (void)pvParameters;
@@ -794,14 +1058,19 @@ void TaskArmPemilah(void *pvParameters) {
       if (x >= 0) {
         // Pendekatan kiri
         // x = -x;
-        driveServoSudutDalam(x - 9, y + 1, 0x3FF / 14, 0x3FF / 14);
-        delay(1200);
+        driveServoSudutDalam(x + 2, y + 1, 0x3FF / 5, 0x3FF / 5);
+        // driveServoSudutDalam(x , y + 1, 0x3FF / 5, 0x3FF / 5);
+
+        delay(3000);
       } else {
         // Pendekatan kanan
         // x = x;
-        driveServoSudutLuar(-(x - 2), y + 1, 0x3FF / 5, 0x3FF / 5);
-        delay(3000);
-        // delay(1500);
+        driveServoSudutLuar(-(x + 9), y + 1, 0x3FF / 14, 0x3FF / 14);
+
+        // driveServoSudutLuar(-(x + 2), y + 1, 0x3FF / 14, 0x3FF / 14);
+        delay(1200);
+        // driveServoSudutLuar(-(x + 10), y, 0, 0);
+        // delay(10);
       }
       // delay(100);
       // posDefault();
@@ -814,12 +1083,14 @@ void TaskArmPemilah(void *pvParameters) {
       // driveServo(x - 5, y, 0x3FF / 9, 0x3FF / 9);
 
       // INI NGIDE
-
+      // if (x > 0) {
+      //   driveServo(x, y, 0x3FF / 10, 0x3FF / 10);
+      // } else {
+      //   driveServoSudutLuar(-x, y, 0x3FF / 10, 0x3FF / 10);
+      // }
 
       // driveServo(x, y, 0x3FF / 9, 0x3FF / 9);
-
-      // delay(500);
-      // vTaskSuspend(TaskHandle_TaskArmFollow);
+      // delay(700);
       hisap();  // Start the vacuum to pick up the trash
       posServoNgisep();
       delay(900);
@@ -862,8 +1133,8 @@ void TaskArmPemilah(void *pvParameters) {
         default:
           break;
       }
-      servo2(tegak_mx - Deg_mx(178), 0x3FF / 12);
-      servo1(tegak_mx - Deg_mx(88), 0x3FF / 12);
+      servo2(tegak_mx + Deg_mx(178), 0x3FF / 12);
+      servo1(tegak_mx + Deg_mx(88), 0x3FF / 12);
       // servo2(tegak_mx, 0x3FF / 11);
       // servo1(tegak_mx, 0x3FF / 11);
       servo3(tegak_ax, 1023 / 8);
@@ -876,46 +1147,57 @@ void TaskArmPemilah(void *pvParameters) {
       x = 0;
       y = 0;
       // vTaskResume(TaskHandle_TaskArmFollow);
-      // } else vTaskResume(TaskHandle_TaskArmFollow);
-      // else if (tempatSampah == 0 && x == 0 && y == 0) {
-      //   servo2(tegak_mx - Deg_mx(179.5), 0x3FF / 6);
-      //   servo1(tegak_mx - Deg_mx(90), 0x3FF / 10);
-      //   servo3(tegak_ax, 1023 / 2);
-      //   servo4(tegak_ax, 1023 / 2);
+      //terhisap = false;
     }
+    // else if (tempatSampah == 0 && x == 0 && y == 0) {
+    //   servo2(tegak_mx - Deg_mx(179.5), 0x3FF / 6);
+    //   servo1(tegak_mx - Deg_mx(90), 0x3FF / 10);
+    //   servo3(tegak_ax, 1023 / 2);
+    //   servo4(tegak_ax, 1023 / 2);
+    // }
 
     vTaskDelay(1);  // Adjust the delay as necessary for your task scheduling
   }
 }
 
-void TaskArmFollow(void *pvParameters) {
+void TaskArmToSampah(void *pvParameters) {
   (void)pvParameters;
 
   for (;;) {
-    // if (tempatSampah != 0 && x != 0 && y != 0 /&& terhisap != true/) {
-    // Move the arm to the coordinates (x, y)
-    vTaskSuspend(TaskHandle_TaskArmPemilah);
-    if (x != 0 && y != 0) {
-      if (x >= 0) {
-        driveServoSudutDalam(x - 10, y, 0x3FF / 9, 0x3FF / 9);
-        if (x == 0) driveServoSudutDalam(x - 10, y - 5, 0x3FF / 9, 0x3FF / 9);
-        // delay(2000);
-      } else {
-        driveServoSudutLuar(-(x - 5), y, 0x3FF / 9, 0x3FF / 9);
-        if (x == 0) driveServoSudutLuar(-(x - 5), y - 5, 0x3FF / 9, 0x3FF / 9);
-        // delay(5000);
-      }
-    }
-
-    // delay(300);
-    // driveServo(x - 5, y, 0x3FF / 6, 0x3FF / 6);
-    // delay(300);
-    // driveServo(x - 20, y, 0x3FF / 6, 0x3FF / 6);
-    // delay(300);
-    // else
-    x = 0;
-    y = 0;
-    vTaskResume(TaskHandle_TaskArmPemilah);
-    vTaskDelay(1);  // Adjust the delay as necessary for your task scheduling
+    sampah1();
+    // Serial.println("1");
+    delay(5000);
+    sampah2();
+    // Serial.println("2");
+    delay(3000);
+    sampah3();
+    // Serial.println("3");
+    delay(3000);
+    sampah4();
+    // Serial.println("4");
+    delay(3000);
+    sampah5();
+    // Serial.println("5");
+    delay(5000);
+    vTaskDelay(1);
   }
 }
+
+// void TaskArmFollow(void *pvParameters) {
+//   (void)pvParameters;
+
+//   for (;;) {
+//     if (tempatSampah != 0 && x != 0 && y != 0 /&& terhisap != true/) {
+//       // Move the arm to the coordinates (x, y)
+//       vTaskSuspend(TaskHandle_TaskArmPemilah);
+//       driveServoSudutLuar(x + 15, y, 0x3FF / 6, 0x3FF / 6);
+//       delay(300);
+//       driveServoSudutLuar(x + 5, y, 0x3FF / 6, 0x3FF / 6);
+//       delay(300);
+//       driveServoSudutLuar(x + 20, y, 0x3FF / 6, 0x3FF / 6);
+//       delay(300);
+//       vTaskResume(TaskHandle_TaskArmPemilah);
+//       vTaskDelay(1);  // Adjust the delay as necessary for your task scheduling
+//     }
+//   }
+// }
