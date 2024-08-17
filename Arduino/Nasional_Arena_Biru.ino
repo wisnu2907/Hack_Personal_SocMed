@@ -343,7 +343,7 @@ void com_agv_motor_odometry(int dSL, int dSR) {
   // Serial.print('\t');
 
   delta_theta = (dRR - dRL) * (d_wheel / wheelBase) / pulse_rotation;
-  Serial.println(delta_theta);
+  // Serial.println(delta_theta);
   theta += delta_theta;
 
   // Calculate PID for theta
@@ -373,9 +373,9 @@ void com_agv_motor_odometry(int dSL, int dSR) {
   else if (dSR > 0) pwmR = SpeedR;
   else pwmR = 0;
 
-  Serial.print(SpeedL);
-  Serial.print("\t");
-  Serial.println(SpeedR);
+  // Serial.print(SpeedL);
+  // Serial.print("\t");
+  // Serial.println(SpeedR);
 
   agv_motor(pwmL, pwmR);
 }
@@ -390,7 +390,7 @@ void com_agv_motor_MPU(int dSL, int dSR) {
   CountL += (float)dRL / 11.14;
   CountR += (float)dRR / 11.14;
 
-  Serial.println(CountL);
+  // Serial.println(CountL);
 
   //42.2 = pulse_rotation/(k_wheel)
 
@@ -398,12 +398,12 @@ void com_agv_motor_MPU(int dSL, int dSR) {
   myEncL.write(0);
   myEncR.write(0);
 
-  thetaErr = 0.0 - angleZ;
+  thetaErr = 0 - angleZ;
   sumThetaErr += thetaErr;
   dThetaErr = thetaErr - lastThetaErr;
   lastThetaErr = thetaErr;
 
-  thetaCorrection = (float)(1 * thetaErr) + (float)(0.00 * dThetaErr) + (float)(0 * sumThetaErr);
+  thetaCorrection = (float)(1.2 * thetaErr) + (float)(0.00 * dThetaErr) + (float)(0 * sumThetaErr);
   // thetaCorrection = (float)(2 * thetaErr) + (float)(4 * dThetaErr) + (float)(0 * sumThetaErr);
 
   // Print theta (orientation)
@@ -440,7 +440,7 @@ void com_agv_motor_MPU2(int dSL, int dSR) {
   CountL += (float)dRL / 11.14;
   CountR += (float)dRR / 11.14;
 
-  Serial.println(CountL);
+  // Serial.println(CountL);
 
   //42.2 = pulse_rotation/(k_wheel)
 
@@ -448,12 +448,14 @@ void com_agv_motor_MPU2(int dSL, int dSR) {
   myEncL.write(0);
   myEncR.write(0);
 
+  // thetaErr = -90 - angleZ;
   thetaErr = -88.5 - angleZ;
+
   sumThetaErr += thetaErr;
   dThetaErr = thetaErr - lastThetaErr;
   lastThetaErr = thetaErr;
 
-  thetaCorrection = (float)(1 * thetaErr) + (float)(0.00 * dThetaErr) + (float)(0 * sumThetaErr);
+  thetaCorrection = (float)(1.5 * thetaErr) + (float)(0.00 * dThetaErr) + (float)(0 * sumThetaErr);
   // thetaCorrection = (float)(2 * thetaErr) + (float)(4 * dThetaErr) + (float)(0 * sumThetaErr);
 
   // Print theta (orientation)
@@ -464,11 +466,15 @@ void com_agv_motor_MPU2(int dSL, int dSR) {
   SpeedL = dSL - thetaCorrection;
   SpeedR = dSR + thetaCorrection;
 
+
+  // SpeedL = dSL + thetaCorrection;
+  // SpeedR = dSR - thetaCorrection;
+
   if (SpeedL >= 255) SpeedL = 255;
   if (SpeedR >= 255) SpeedR = 255;
 
   if (dSL < 0) pwmL = -SpeedL;
-  else if (dSL > 0) pwmL = SpeedL;io
+  else if (dSL > 0) pwmL = SpeedL;
   else pwmL = 0;
   if (dSR < 0) pwmR = -SpeedR;
   else if (dSR > 0) pwmR = SpeedR;
@@ -521,8 +527,8 @@ void setup() {
   Serial2.begin(9600);
   Wire.begin();
   mpu.initialize();
-  // Serial.setTimeout(1);
-  // Serial2.setTimeout(1);
+  Serial.setTimeout(10000);
+  Serial2.setTimeout(10000);
   init_motor();
   pinMode(12, INPUT);
   pinMode(13, OUTPUT);
@@ -537,8 +543,8 @@ void setup() {
   Dynamixel.setMode(ID3, SERVO, CW_LIMIT_ANGLE, CCW_LIMIT_ANGLE_AX);
   Dynamixel.setMode(ID4, SERVO, CW_LIMIT_ANGLE, CCW_LIMIT_ANGLE_AX);
 
-  servo2(tegak_mx + Deg_mx(179.5), 0x3FF / 10);
-  servo1(tegak_mx + Deg_mx(90), 0x3FF / 10);
+  servo2(tegak_mx - Deg_mx(175), 0x3FF / 10);
+  servo1(tegak_mx - Deg_mx(85), 0x3FF / 10);
   servo3(tegak_ax, 1023 / 2);
   servo4(tegak_ax, 1023 / 2);
 
@@ -577,12 +583,12 @@ void setup() {
 
   xTaskCreate(TaskComm, "Comm", 128, NULL, 4, NULL);
   xTaskCreate(TaskMajuAwal, "Motor", 128, NULL, 3, &TaskHandle_TaskMajuAwal);
-  xTaskCreate(TaskLeft, "Motor", 128, NULL, 3, &TaskHandle_TaskLeft);
-  xTaskCreate(TaskMajuKedua, "Motor", 128, NULL, 2, &TaskHandle_TaskMajuKedua);
+  // xTaskCreate(TaskLeft, "Motor", 128, NULL, 3, &TaskHandle_TaskLeft);
+  // xTaskCreate(TaskMajuKedua, "Motor", 128, NULL, 2, &TaskHandle_TaskMajuKedua);
   xTaskCreate(TaskArmPemilah, "Motor", 128, NULL, 1, &TaskHandle_TaskArmPemilah);
   // xTaskCreate(TaskArmToSampah, "Motor", 128, NULL, 1, NULL);
   // xTaskCreate(TaskArmFollow, "Motor", 128, NULL, 1, &TaskHandle_TaskArmFollow);
-  xTaskCreate(TaskMPU, "MPU", 128, NULL, 4, NULL);
+  xTaskCreate(TaskMPU, "MPU", 128, NULL, 4, &TaskHandle_TaskMPU);
 }
 
 String input;
@@ -602,17 +608,20 @@ void lepas() {
   digitalWrite(vacuum, LOW);
 }
 
-void sampah1() {
+void sampah5() {
   // driveServo(39 + 3, 63 + 2, 0x3FF / 8, 0x3FF / 8);
   // servo1(tegak_mx + Deg_mx(33), 0x3FF / 8);
   // delay(1);
   // servo2(tegak_mx - Deg_mx(0), 0x3FF / 8);
   // delay(1);
-  driveServoSudutLuar(-36, 66, 0x3FF / 8, 0x3FF / 8);
+  driveServoSudutDalam(36, 66, 0x3FF / 8, 0x3FF / 8);
   delay(2000);
   // posDefault();
   // delay
-  posServoUjungSampah(1000);
+  servo3(tegak_ax, 1000);
+  delay(1);
+  servo4(tegak_ax + Deg_ax(90), 1000);
+  delay(1);
   delay(1000);
   // Release the trash
   lepas();
@@ -623,8 +632,8 @@ void sampah1() {
   delay(500);
 }
 
-void sampah4() {
-  driveServoSudutLuar(22, 66, 0x3FF / 8, 0x3FF / 8);
+void sampah2() {
+  driveServoSudutDalam(-22, 66, 0x3FF / 8, 0x3FF / 8);
   delay(1400);
   // posDefault();
   // delay
@@ -640,7 +649,7 @@ void sampah4() {
 }
 
 void sampah3() {
-  driveServoSudutLuar(-1, 66, 0x3FF / 8, 0x3FF / 8);
+  driveServoSudutDalam(0, 66, 0x3FF / 8, 0x3FF / 8);
   delay(1400);
   // posDefault();
   // delay
@@ -655,8 +664,8 @@ void sampah3() {
   delay(400);
 }
 
-void sampah2() {
-  driveServoSudutLuar(-21, 66, 0x3FF / 8, 0x3FF / 8);
+void sampah4() {
+  driveServoSudutDalam(21, 66, 0x3FF / 8, 0x3FF / 8);
   delay(1400);
   // posDefault();
   // delay
@@ -671,7 +680,7 @@ void sampah2() {
   delay(400);
 }
 
-void sampah5() {
+void sampah1() {
   // driveServo(-39 - 4, 63, 0x3FF / 8, 0x3FF / 8);
   servo1(tegak_mx - Deg_mx(40), 0x3FF / 8);
   delay(1);
@@ -682,7 +691,10 @@ void sampah5() {
   delay(2000);
   // posDefault();
   // delay
-  posServoUjungSampah(1000);
+  servo3(tegak_ax, 1000);
+  delay(1);
+  servo4(tegak_ax + Deg_ax(90), 1000);
+  delay(1);
   delay(600);
   // Release the trash
   lepas();
@@ -798,15 +810,25 @@ void loop() {
 void parseData(String data) {
   int arrayIndex = 0;
   String valueStr = "";
+  // Serial.println("2");
 
   for (int i = 0; i < data.length(); i++) {
     char c = data.charAt(i);
+    // Serial.println("3");
+
     if (c == '*') {
       arrays[arrayIndex / arraySize][arrayIndex % arraySize] = valueStr.toFloat();
+      // Serial.println("4");
+
       valueStr = "";
+      // Serial.println("5");
+
       arrayIndex++;
+      // Serial.println("6");
+
     } else if ((c >= '0' && c <= '9') || c == '.' || c == '-') {
       valueStr += c;
+      // Serial.println("7");
     }
   }
   // Add the last value
@@ -814,6 +836,8 @@ void parseData(String data) {
   tempatSampah = arrays[0][0];
   x = arrays[0][1];
   y = arrays[0][2];
+  // Serial.println("11");
+
   // Serial.print("tempatSampah: ");
   // Serial.println(tempatSampah);
   // Serial.print("x: ");
@@ -921,7 +945,7 @@ void TaskMPU(void *pvParameters) {
     angleZ += gyroZ_avg * dt;
 
     // Tampilkan nilai sudut
-    Serial.print("Angle Z: ");
+    // Serial.print("Angle Z: ");
     Serial.println(angleZ);
 
     vTaskDelay(1);
@@ -938,8 +962,12 @@ void TaskMajuAwal(void *pvParameters) {
     // Serial.println(digitalRead(bt1));
     // Serial.println("TaskMajuAwal");
     // vTaskSuspend(TaskHandle_TaskComm);
-    vTaskSuspend(TaskHandle_TaskLeft);  //Suspend Task2/3
-    vTaskSuspend(TaskHandle_TaskMajuKedua);
+    // servo2(tegak_mx - Deg_mx(175), 0x3FF / 10);
+    // servo1(tegak_mx - Deg_mx(85), 0x3FF / 10);
+    // servo3(tegak_ax, 1023 / 2);
+    // servo4(tegak_ax, 1023 / 2);
+    // vTaskSuspend(TaskHandle_TaskLeft);  //Suspend Task2/3
+    // vTaskSuspend(TaskHandle_TaskMajuKedua);
     vTaskSuspend(TaskHandle_TaskArmPemilah);
 
 
@@ -955,27 +983,28 @@ void TaskMajuAwal(void *pvParameters) {
 
     if (count == 1) {
 
-      // com_agv_motor(6, 6);
-      com_agv_motor_MPU(30, 30);
+      // com_agv_motor(2, 2);
+      com_agv_motor_MPU(25, 25);
 
       // com_agv_motor_odometry(14, 14);
       // Serial.println(mErrL);
       // Serial.print("CountL:");
       // Serial.print(CountL);
-      // Serial.print("  CountR:");
-      // Serial.println(CountR);
+      Serial.print("  CountR:");
+      Serial.println(CountR);
       // if (CountR >= 165678.64 - 1000) {
       // if (CountR >= 109980 + 5000) {
-      if (CountR >= 431) {
+      // if (CountR >= 68.4) {
+      if (CountR >= 95.4) {
 
         // if (CountL >= 200) {
 
         Stop();
-        delay(1000);
+        delay(800);
         CountL = 0;
         CountR = 0;
-        delay(200);
-        vTaskResume(TaskHandle_TaskLeft);
+        delay(100);
+        vTaskResume(TaskHandle_TaskArmPemilah);
         vTaskDelete(TaskHandle_TaskMajuAwal);
         delay(100);
       }
@@ -987,63 +1016,76 @@ void TaskMajuAwal(void *pvParameters) {
   // vTaskDelay(1);
 }
 
-void TaskLeft(void *pvParameters) {
-  (void)pvParameters;
+// void TaskLeft(void *pvParameters) {
+//   (void)pvParameters;
 
-  for (;;) {
-    //Untuk Maju //Suspend Task2/3
-    // Serial.println("TaskLeft");
-    // vTaskSuspend(TaskHandle_TaskComm);
-    vTaskSuspend(TaskHandle_TaskMajuKedua);
-    vTaskSuspend(TaskHandle_TaskArmPemilah);
+//   for (;;) {
+//     //Untuk Maju //Suspend Task2/3
+//     // Serial.println("TaskLeft");
+//     // vTaskSuspend(TaskHandle_TaskComm);
+//     // servo2(tegak_mx - Deg_mx(175), 0x3FF / 10);
+//     // servo1(tegak_mx - Deg_mx(85), 0x3FF / 10);
+//     // servo3(tegak_ax, 1023 / 2);
+//     // servo4(tegak_ax, 1023 / 2);
+//     vTaskSuspend(TaskHandle_TaskMajuKedua);
+//     vTaskSuspend(TaskHandle_TaskArmPemilah);
 
-    com_agv_motor(4, -4);
-    // agv_motor(30, -30);
-    // Serial.println(mErrL);
+//     com_agv_motor(4, -4);
+//     // agv_motor(30, -30);
+//     // Serial.println(mErrL);
 
-    // Serial.println(CountL);
-    if (angleZ <= -86 && angleZ >= -91) {
-      // if (CountL >= 35.4) {
-      // com_agv_motor_MPU(20, -20);
-      // delay(2000);
-      Stop();
-      delay(1000);
-      CountL = 0;
-      CountR = 0;
-      delay(200);
-      vTaskResume(TaskHandle_TaskMajuKedua);
-      vTaskDelete(TaskHandle_TaskLeft);
-      delay(100);
-    }
-  }
-}
+//     // Serial.println(CountL);
+//     if (angleZ <= -89 && angleZ >= -91) {
+//       // if (CountL >= 35.4) {
+//       // com_agv_motor_MPU(20, -20);
+//       // delay(2000);
+//       Stop();
+//       delay(800);
+//       CountL = 0;
+//       CountR = 0;
+//       delay(100);
+//       vTaskResume(TaskHandle_TaskMajuKedua);
+//       vTaskDelete(TaskHandle_TaskLeft);
+//       delay(100);
+//     }
+//   }
+// }
 
-void TaskMajuKedua(void *pvParameters) {
-  (void)pvParameters;
+// void TaskMajuKedua(void *pvParameters) {
+//   (void)pvParameters;
 
-  for (;;) {
-    //Untuk Maju
-    // Serial.println("TaskMajuKedua");
-    // vTaskSuspend(TaskHandle_TaskComm);
-    vTaskSuspend(TaskHandle_TaskArmPemilah);
+//   for (;;) {
+//     //Untuk Maju
+//     // Serial.println("TaskMajuKedua");
+//     // vTaskSuspend(TaskHandle_TaskComm);
+//     // servo2(tegak_mx - Deg_mx(175), 0x3FF / 10);
+//     // servo1(tegak_mx - Deg_mx(85), 0x3FF / 10);
+//     // servo3(tegak_ax, 1023 / 2);
+//     // servo4(tegak_ax, 1023 / 2);
+//     vTaskSuspend(TaskHandle_TaskArmPemilah);
 
-    com_agv_motor_MPU2(20, 20);
-    // Serial.println(mErrL);
+//     com_agv_motor_MPU2(25, 25);
+//     // Serial.println(mErrL);
 
-    // Serial.println(CountL);
-    // if (CountR >= 135) {
-    if (CountR >= 136) {
+//     // Serial.println(CountL);
+//     // if (CountR >= 135) {
+//     if (CountL >= 127) {
 
-      // if (CountL >= 100) {
-      Stop();
-      delay(500);
-      vTaskResume(TaskHandle_TaskArmPemilah);
-      // vTaskResume(TaskHandle_TaskComm);
-      vTaskDelete(TaskHandle_TaskMajuKedua);
-      delay(100);
-    }
-  }
-}
+//       // if (CountL >= 100) {
+//       servo2(tegak_mx - Deg_mx(175), 0x3FF / 10);
+//       servo1(tegak_mx - Deg_mx(85), 0x3FF / 10);
+//       servo3(tegak_ax, 1023 / 2);
+//       servo4(tegak_ax, 1023 / 2);
+//       Stop();
+//       delay(500);
+//       vTaskResume(TaskHandle_TaskArmPemilah);
+//       // vTaskResume(TaskHandle_TaskComm);
+//       vTaskDelete(TaskHandle_TaskMajuKedua);
+//       vTaskSuspend(TaskHandle_TaskMPU);
+//       delay(100);
+//     }
+//   }
+// }
 
 //bool terhisap = false;
 
@@ -1052,23 +1094,33 @@ void TaskArmPemilah(void *pvParameters) {
 
   for (;;) {
     // vTaskSuspend(TaskHandle_TaskArmFollow);
+    vTaskSuspend(TaskHandle_TaskMPU);
+
     if (x != 0 && y != 0) {
       // int x;
+      // Serial.println("12dd");
+      // Serial.println("12dd");
       int address = tempatSampah;
       if (x >= 0) {
         // Pendekatan kiri
         // x = -x;
-        driveServoSudutDalam(x + 2, y + 1, 0x3FF / 5, 0x3FF / 5);
+        driveServoSudutDalam(x - 6, y + 1, 0x3FF / 14, 0x3FF / 14);
+        // Serial.println("13ee");
+
+        // Serial.println("13ee");
+
         // driveServoSudutDalam(x , y + 1, 0x3FF / 5, 0x3FF / 5);
 
-        delay(3000);
+        delay(1200);
       } else {
         // Pendekatan kanan
         // x = x;
-        driveServoSudutLuar(-(x + 9), y + 1, 0x3FF / 14, 0x3FF / 14);
+        driveServoSudutLuar(-(x - 9), y + 1, 0x3FF / 5, 0x3FF / 5);
+        // Serial.println("14ee");
+
 
         // driveServoSudutLuar(-(x + 2), y + 1, 0x3FF / 14, 0x3FF / 14);
-        delay(1200);
+        delay(3000);
         // driveServoSudutLuar(-(x + 10), y, 0, 0);
         // delay(10);
       }
@@ -1092,9 +1144,15 @@ void TaskArmPemilah(void *pvParameters) {
       // driveServo(x, y, 0x3FF / 9, 0x3FF / 9);
       // delay(700);
       hisap();  // Start the vacuum to pick up the trash
+      // Serial.println("14zz");
+
       posServoNgisep();
+      // Serial.println("15aa");
+
       delay(900);
       posDefault();
+      // Serial.println("16qq");
+
       delay(500);
       // delay(500);
 
@@ -1112,32 +1170,47 @@ void TaskArmPemilah(void *pvParameters) {
         //   break;
         case 1:
           // previousTempatSampah = 1;
-          sampah1();
+          sampah3();
+          // Serial.println("17ww");
+
           break;
         case 2:
           // previousTempatSampah = 2;
-          sampah2();
+          sampah5();
+          // Serial.println("18rr");
+
           break;
         case 3:
           // previousTempatSampah = 3;
-          sampah3();
+          sampah2();
+          // Serial.println("19tt");
+
           break;
         case 4:
           // previousTempatSampah = 4;
           sampah4();
+          // Serial.println("20pp");
+
           break;
         case 5:
           // previousTempatSampah = 5;
-          sampah5();
+          sampah1();
+          // Serial.println("21ss");
+
           break;
         default:
           break;
       }
-      servo2(tegak_mx + Deg_mx(178), 0x3FF / 12);
-      servo1(tegak_mx + Deg_mx(88), 0x3FF / 12);
+      // Serial.println("22aa");
+      servo2(tegak_mx - Deg_mx(175), 0x3FF / 12);
+      // Serial.println("23pp");
+      servo1(tegak_mx - Deg_mx(85), 0x3FF / 12);
+      // Serial.println("24mm");
+
       // servo2(tegak_mx, 0x3FF / 11);
       // servo1(tegak_mx, 0x3FF / 11);
       servo3(tegak_ax, 1023 / 8);
+      // Serial.println("25oo");
       servo4(tegak_ax, 1023 / 8);
 
       delay(500);
@@ -1160,28 +1233,28 @@ void TaskArmPemilah(void *pvParameters) {
   }
 }
 
-void TaskArmToSampah(void *pvParameters) {
-  (void)pvParameters;
+// void TaskArmToSampah(void *pvParameters) {
+//   (void)pvParameters;
 
-  for (;;) {
-    sampah1();
-    // Serial.println("1");
-    delay(5000);
-    sampah2();
-    // Serial.println("2");
-    delay(3000);
-    sampah3();
-    // Serial.println("3");
-    delay(3000);
-    sampah4();
-    // Serial.println("4");
-    delay(3000);
-    sampah5();
-    // Serial.println("5");
-    delay(5000);
-    vTaskDelay(1);
-  }
-}
+//   for (;;) {
+//     sampah1();
+//     // Serial.println("1");
+//     delay(5000);
+//     sampah2();
+//     // Serial.println("2");
+//     delay(3000);
+//     sampah3();
+//     // Serial.println("3");
+//     delay(3000);
+//     sampah4();
+//     // Serial.println("4");
+//     delay(3000);
+//     sampah5();
+//     // Serial.println("5");
+//     delay(5000);
+//     vTaskDelay(1);
+//   }
+// }
 
 // void TaskArmFollow(void *pvParameters) {
 //   (void)pvParameters;
